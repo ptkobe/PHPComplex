@@ -40,8 +40,17 @@ Class PHPComplex implements iPHPComplex
 	/*
 	 *
 	 */
-	function __construct ($x = 0, $y = 0, $s = 0)
+	function __construct ($x = NULL, $y = NULL, $s = NULL)
 	{
+		if ( is_null($x) ) {
+			$x = 0;
+		}
+		if ( is_null($y) ) {
+			$y = 0;
+		}
+		if ( is_null($s) ) {
+			$s = 0;
+		}
 		if ( !is_numeric($x) || !is_numeric($y) ) { // Remember this allows numeric strings.
 			throw new InvalidArgumentException(dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument'));
 		}
@@ -107,8 +116,11 @@ Class PHPComplex implements iPHPComplex
 	/*
 	 * arg will be changed to [-pi(),pi()], and $s will be set
 	 */
-	static function c_polar ($r, $teta = 0)
+	static function c_polar ($r, $teta = NULL)
 	{
+		if ( is_null($teta) ) {
+			$teta = 0;
+		}
 		$c = new static(
 			$r*cos($teta), 
 			$r*sin($teta)

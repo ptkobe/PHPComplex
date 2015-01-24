@@ -179,6 +179,56 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(2*pi()*2, $a->teta());
 	}
 
+	public function testNew_NULL_0 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = new $class();
+		$t = new $class(0,0,0);
+
+		// Assert
+		$this->assertEquals($t, $a);
+	}
+
+	public function testNew_NULL_1 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = new $class(3);
+		$t = new $class(3,0,0);
+
+		// Assert
+		$this->assertEquals($t, $a);
+	}
+
+	public function testNew_NULL_2 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = new $class(NULL,4);
+		$t = new $class(0,4,0);
+
+		// Assert
+		$this->assertEquals($t, $a);
+	}
+
+	public function testNew_NULL_3 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = new $class(NULL,NULL,2);
+		$t = new $class(0,0,2);
+
+		// Assert
+		$this->assertEquals($t, $a);
+	}
+
+	public function testPolar_NULL ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = $class::c_polar(5);
+		$t = new $class(5,0,0);
+
+		// Assert
+		$this->assertEquals($t, $a);
+	}
+
 /* Arg, Teta and S */
 
 	public function testGetS_SetS ()

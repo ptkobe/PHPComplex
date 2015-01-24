@@ -7,14 +7,14 @@ interface iPHPComplex
 {
 	static function is_complex ($a);
 	static function is_a_complex ($a);
-	function __construct ($x = 0, $y = 0, $s = 0);
+	function __construct ($x = NULL, $y = NULL, $s = NULL);
 	function Re ();
 	function Im ();
 	function abs ();
 	function conj ();
 	function arg ();
 	function flat ();
-	static function c_polar ($r, $teta = 0);
+	static function c_polar ($r, $teta = NULL);
 	function teta ($s = NULL);
 	function get_s ($teta = NULL);
 	function set_s ($s, $teta_mode = NULL);

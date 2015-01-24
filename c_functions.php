@@ -7,7 +7,7 @@
 /**
  * array( $re, $im ) -> complex object
  */
-function atoc ($a, $s = 0) {
+function atoc ($a, $s = NULL) {
 	$class = PHPCOMPLEX_CLASS;
 	$c = new $class($a[0], $a[1], $s);
 	return $c;
