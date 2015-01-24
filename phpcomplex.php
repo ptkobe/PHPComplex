@@ -3,6 +3,8 @@
 * @package Math
 */
 
+require_once 'iphpcomplex.php';
+
 /* gettext domain */
 define('PHPCOMPLEX_DOMAIN','phpcomplex');
 
@@ -13,7 +15,7 @@ if (!defined('PHPCOMPLEX_CLASS')) {
 /**
  *
  */
-Class PHPComplex
+Class PHPComplex implements iPHPComplex
 {
 	protected $re;
 	protected $im;
@@ -225,11 +227,8 @@ Class PHPComplex
 	/**
 	 * @return complex
 	 */
-	function exp ($s = NULL)
+	function exp ()
 	{
-		if ( !is_null($s) ) {
-			throw new LogicException('invalid call');
-		}
 		$c = static::c_polar(
 			exp($this->re), 
 			$this->im
