@@ -5,6 +5,8 @@ Basic complex numbers operations, including `$a->log()`, `$a->exp()` and `$a->po
 
 Vector and polar definitions with branches.
 
+for PHP 5
+
 ## Usage
 
 Optionally create your own class extending **PHPComplex** and set `PHPCOMPLEX_CLASS` accordingly.
