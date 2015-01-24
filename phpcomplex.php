@@ -94,7 +94,7 @@ Class PHPComplex implements iPHPComplex
 	}
 	
 	/*
-	 *
+	 * @return mixed A float if Im == 0 or the complex.
 	 */
 	function flat ()
 	{
