@@ -378,8 +378,8 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$z = new $class(.5, 0);
 		$res = $class::c_apow($a, $z, 0);
 		$t = array(
-			new $class(-2, -1, 0),
-			new $class(2, 1, 0),
+			-3 => new $class(-2, -1, 0),
+			-2 => new $class(2, 1, 0),
 		);
 
 		// Assert
@@ -393,7 +393,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$z = new $class(0, 2);
 		$res = $class::c_apow($a, $z, 0);
 		$t = array(
-			new $class(-1.8978091263029E-12, -1.4696140923872E-13, 1),
+			0 => new $class(-1.8978091263029E-12, -1.4696140923872E-13, 1),
 		);
 
 		// Assert
@@ -407,9 +407,9 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$z = new $class(-1/3, 1);
 		$res = $class::c_apow($a, $z, 0);
 		$t = array(
-			new $class(-7.8112259997596E-7, -2.0206972129886E-7, 0),
-			new $class(0.0003028520245176, -0.00030814179446006, 0),
-			new $class(0.061813199275868, 0.2229511175794, 0),
+			0 => new $class(-7.8112259997596E-7, -2.0206972129886E-7, 0),
+			-1 => new $class(0.0003028520245176, -0.00030814179446006, 0),
+			-2 => new $class(0.061813199275868, 0.2229511175794, 0),
 		);
 
 		// Assert
@@ -423,9 +423,9 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$z = new $class(1/3, 1);
 		$res = $class::c_apow($a, $z, 1);
 		$t = array(
-			new $class(-0.00081333769146394, -0.00096669227585866, 1),
-			new $class(2.3228166142922E-6, -4.1275146391821E-7, 1),
-			new $class(-1.5013400221071E-9, 4.1419766403179E-9, 1),
+			-1 => new $class(-0.00081333769146394, -0.00096669227585866, 1),
+			0 => new $class(2.3228166142922E-6, -4.1275146391821E-7, 1),
+			1 => new $class(-1.5013400221071E-9, 4.1419766403179E-9, 1),
 		);
 
 		// Assert
@@ -436,10 +436,24 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4, 2);
+		$z = new $class(-1/3, 1);
+		$res = $class::c_apow($a, $z);
+		$t = array(
+			0 => new $class(-7.8112259997596E-7, -2.0206972129886E-7, 0),
+		);
+
+		// Assert
+		$this->assertEquals($t, $res);
+	}
+
+	public function testApow_APow_6 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = new $class(3, 4, 2);
 		$z = new $class(1/3, 1);
 		$res = $class::c_apow($a, $z);
 		$t = array(
-			new $class(2.3228166142922E-6, -4.1275146391821E-7, 1),
+			0 => new $class(2.3228166142922E-6, -4.1275146391821E-7, 1),
 		);
 
 		// Assert

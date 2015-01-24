@@ -246,7 +246,8 @@ Class PHPComplex implements iPHPComplex
 		reset($av);
 		
 		if ( is_null($s) ) {
-			return current($av);
+			#return current($av);
+			return $av[0];
 		}
 		
 		while ( (list($k, $v) = each($av)) ) {
@@ -257,6 +258,7 @@ Class PHPComplex implements iPHPComplex
 		}
 		
 		/*
+		// if $av was not ordered
 		reset($av);
 		list($key, $v) = each($av);
 		$p = $v->arg();
@@ -283,7 +285,7 @@ Class PHPComplex implements iPHPComplex
 
 		if ( ( $a->abs() == 0 ) ) {
 			$av = array( 
-				new static(1, 0, $s)
+				0 => new static(1, 0, $s)
 			);
 			return $av;
 		}
@@ -291,7 +293,7 @@ Class PHPComplex implements iPHPComplex
 		if ( ( $z->Re() == 0 ) ) {
 			if ( ( $z->Im() == 0 ) ) {
 				$av = array( 
-					new static(1, 0, $s)
+					0 => new static(1, 0, $s)
 				);
 				return $av;
 			}
@@ -299,14 +301,15 @@ Class PHPComplex implements iPHPComplex
 			$r_v = exp(-$z->Im() * $a->teta());
 			$teta_v = $z->Im() * log($a->abs());
 			$av = array( 
-				static::c_polar($r_v, $teta_v)
+				0 => static::c_polar($r_v, $teta_v)
 			);
 			return $av;
 		}
 		
 		if ( is_null($s) ) {
+			// return only the k=0 value
 			return array(
-				static::c_mult($z, $a->log())->exp()
+				0 => static::c_mult($z, $a->log())->exp()
 			);
 		}
 
@@ -314,6 +317,9 @@ Class PHPComplex implements iPHPComplex
 		#echo 'c_apow 1/abs(c) ',1/abs($c),"\n";
 		#echo 'c_apow s ',$s,"\n";
 		$tv = ( $z->Im() * log($a->abs()) + $c * $a->teta() )/(2*pi()); 
+	#if ( is_null($s) ) {
+	#	$s = (int) ceil( ($tv + 1/2) ) - 1;
+	#}
 		if ( ( $c > 0 ) ) {
 			$k = (int) floor( (-$tv + $s - 1/2)/$c ) + 1;
 		} else {
@@ -329,14 +335,14 @@ Class PHPComplex implements iPHPComplex
 			$f = (int) floor( (-$tv + $s + 1/2)/$c );
 			do {
 				$a->set_s($sa+$k);
-				$av[] = static::c_mult($z, $a->log())->exp();
+				$av[$k] = static::c_mult($z, $a->log())->exp();
 				$k++;
 			} while ( ($k <= $f) );
 		} else {
 			$f = (int) ceil( (-$tv + $s + 1/2)/$c );
 			do {
 				$a->set_s($sa+$k);
-				$av[] = static::c_mult($z, $a->log())->exp();
+				$av[$k] = static::c_mult($z, $a->log())->exp();
 				$k--;
 			} while ( ($k >= $f) );
 		}
