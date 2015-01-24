@@ -350,10 +350,10 @@ Class PHPComplex implements iPHPComplex
 	static function c_add ($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, $s);
+			$a = new static($a, NULL, $s);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, $s);
+			$b = new static($b, NULL, $s);
 		}
 		if ( is_null($s) ) {
 			$s = $a->get_s();
@@ -372,10 +372,10 @@ Class PHPComplex implements iPHPComplex
 	static function c_sub ($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, $s);
+			$a = new static($a, NULL, $s);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, $s);
+			$b = new static($b, NULL, $s);
 		}
 		if ( is_null($s) ) {
 			$s = $a->get_s();
@@ -394,10 +394,10 @@ Class PHPComplex implements iPHPComplex
 	static function c_mult ($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, $s);
+			$a = new static($a, NULL, $s);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, $s);
+			$b = new static($b, NULL, $s);
 		}
 		$c = new static(
 			$a->Re()*$b->Re()-$a->Im()*$b->Im(),
@@ -416,10 +416,10 @@ Class PHPComplex implements iPHPComplex
 	static function c_div ($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, $s);
+			$a = new static($a, NULL, $s);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, $s);
+			$b = new static($b, NULL, $s);
 		}
 		$r2b = pow($b->Re(),2) + pow($b->Im(),2);
 		if ( ($r2b == 0) ) {
