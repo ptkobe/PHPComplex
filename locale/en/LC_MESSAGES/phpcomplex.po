@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PHPComplex\n"
-"POT-Creation-Date: 2015-01-24 02:09+0100\n"
-"PO-Revision-Date: 2015-01-24 02:12+0100\n"
+"POT-Creation-Date: 2015-01-31 23:03+0100\n"
+"PO-Revision-Date: 2015-01-31 23:03+0100\n"
 "Last-Translator: ptkobe <incineracao@gmail.com>\n"
 "Language-Team: enove <luis.barbas@gmail.com>\n"
 "Language: en_US\n"
@@ -15,10 +15,10 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: phpcomplex.php:46
+#: Complex.php:56
 msgid "invalid argument"
 msgstr "invalid argument"
 
-#: phpcomplex.php:426
+#: Complex.php:367
 msgid "invalid result"
 msgstr "invalid result"
