@@ -1,12 +1,15 @@
 <?php
+/**
+* @package PHPComplex
+*/
 
 // see autoloading
-require_once '../phpcomplex.php';
+require_once '../Complex.php';
 
 class PHPComplexTest extends PHPUnit_Framework_TestCase
 {
 
-/* new and c_polar */
+/* new and polar */
 
 	public function testNew_Abs ()
 	{
@@ -20,7 +23,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar_Abs ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5, 2*2*pi()+atan(4/3));
+		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
 		$this->assertEquals(5, $a->abs());
@@ -65,7 +68,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar_Arg ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5, 2*2*pi()+atan(4/3));
+		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
 		$this->assertEquals(atan(4/3), $a->arg());
@@ -83,7 +86,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar_Teta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5, 2*2*pi()+atan(4/3));
+		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
 		$this->assertEquals(2*2*pi()+atan(4/3), $a->teta());
@@ -101,7 +104,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar_Re ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5, 2*2*pi()+atan(4/3));
+		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
 		$this->assertEquals(3, $a->Re());
@@ -119,7 +122,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar_Im ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5, 2*2*pi()+atan(4/3));
+		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
 		$this->assertEquals(4, $a->Im());
@@ -137,7 +140,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar0_Abs ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(0, 2*2*pi());
+		$a = $class::polar(0, 2*2*pi());
 
 		// Assert
 		$this->assertEquals(0, $a->abs());
@@ -155,7 +158,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar0_Arg ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(0, 2*2*pi());
+		$a = $class::polar(0, 2*2*pi());
 
 		// Assert
 		$this->assertEquals(0, $a->arg());
@@ -173,7 +176,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar0_Teta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(0, 2*2*pi());
+		$a = $class::polar(0, 2*2*pi());
 
 		// Assert
 		$this->assertEquals(2*pi()*2, $a->teta());
@@ -222,7 +225,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testPolar_NULL ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5);
+		$a = $class::polar(5);
 		$t = new $class(5,0,0);
 
 		// Assert
@@ -255,7 +258,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4, 3);
-		$a->set_s(4*2*pi()+atan(4/3), TRUE);
+		$a->set_s($a->s_teta( 4*2*pi()+atan(4/3) ));
 
 		// Assert
 		$this->assertEquals(atan(4/3), $a->arg());
@@ -264,7 +267,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testGetS_Polar ()
 	{
 		$class = PHPCOMPLEX_CLASS;
-		$a = $class::c_polar(5, 2*2*pi()+atan(4/3));
+		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
 		$this->assertEquals(2, $a->get_s());
@@ -289,6 +292,29 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	}
 
 /* +, -, *, / */
+
+/* c_atoc, flat */
+
+	public function testAtoc_1 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = array(3,4,2);
+		$t = new $class(3, 4, 2);
+
+		// Assert
+		$this->assertEquals($t, $class::atoc($a));
+	}
+
+	public function testAtoc_2 ()
+	{
+		$class = PHPCOMPLEX_CLASS;
+		$a = array(3,4);
+		$t = new $class(3, 4, 0);
+
+		// Assert
+		$this->assertEquals($t, $class::atoc($a));
+	}
+
 
 /* log, exp */
 
@@ -511,3 +537,5 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	}
 
 }
+
+?>

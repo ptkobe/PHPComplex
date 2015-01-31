@@ -1,29 +1,41 @@
 # PHPComplex
-Complex number calculus.
 
-Basic complex numbers operations, including `$a->log()`, `$a->exp()` and `$a->pow($z)`.
+Complex Vector and polar definitions with "branches".
 
-Vector and polar definitions with branches.
+Elementary complex numbers operations, plus `$a->log()`, `$a->exp()` and `$a->pow($z)`.
 
-for PHP 5
+Namespace: enove\PHPComplex
+
+(for PHP 5)
 
 ## Usage
 
-Optionally create your own class extending **PHPComplex** and set `PHPCOMPLEX_CLASS` accordingly.
+Include '*Complex.php*':
+require_once '<path>/Complex.php';
 
-Include '*phpcomplex.php*'.
+Set namespace:
+use enove\PHPComplex\Complex;
 
-Include also '*c_functions.php*' if you want the procedural style functions.
+create a complex:
+ $w = new Complex(3, 4);
+or
+ $w = Complex::polar(1, pi()/3);
 
-See **iPHPComplex** interface (*iphpcomplex.php*)
+print a complex:
+ echo $w;
+ 
+## More
+Optionally include '*c_functions.php*' if you want the procedural style functions.
+
+See **iComplex** interface (*iComplex.php*)
 
 See **PHPUnit** test (*tests/PHPComplexTest.php*)
+
+Optionally create your own class extending **Complex** and set `PHPCOMPLEX_CLASS` accordingly.
 
 ## To do
 
 phpDoc documentation
-
-PHP namespace
 
 
 
