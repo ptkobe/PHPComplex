@@ -4,7 +4,7 @@ Complex Vector and polar definitions with "branches".
 
 Elementary complex numbers operations, plus `$a->log()`, `$a->exp()` and `$a->pow($z)`.
 
-Namespace: 'enove\PHPComplex'
+Namespace: `enove\PHPComplex`
 
 (for PHP 5)
 
