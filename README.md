@@ -11,17 +11,25 @@ Namespace: enove\PHPComplex
 ## Usage
 
 Include '*Complex.php*':
+
 require_once '<path>/Complex.php';
 
+
 Set namespace:
+
 use enove\PHPComplex\Complex;
 
 create a complex:
+
  $w = new Complex(3, 4);
+ 
 or
+
  $w = Complex::polar(1, pi()/3);
 
+
 print a complex:
+
  echo $w;
  
 ## More
