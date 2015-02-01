@@ -15,7 +15,7 @@ if (!defined('PHPCOMPLEX_CLASS')) {
 }
 
 /**
- *
+ * Class Complex
  */
 class Complex implements iComplex
 {
@@ -24,7 +24,9 @@ class Complex implements iComplex
 	protected $s;
 	
 	/**
-	 *
+	 * Checks if a is a complex of this class.
+	 * 
+	 * @return boolean
 	 */
 	static public function is_complex($a)
 	{
@@ -32,15 +34,17 @@ class Complex implements iComplex
 	}
 
 	/**
-	 *
+	 * Checks if a is a complex of this class or a subclass.
+	 * 
+	 * @return boolean
 	 */
 	static public function is_a_complex($a)
 	{
 		return is_a($a, get_called_class());
 	}
 
-	/*
-	 *
+	/**
+	 * Complex construct.
 	 */
 	public function __construct($x = NULL, $y = NULL, $s = NULL)
 	{
@@ -53,54 +57,88 @@ class Complex implements iComplex
 		if ( is_null($s) ) {
 			$s = 0;
 		}
-		if ( !is_numeric($x) || !is_numeric($y) ) { // Remember this allows numeric strings.
-			throw new InvalidArgumentException(dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument'));
+		
+		// Remember this allows numeric strings.
+		if ( !is_numeric($x) || !is_numeric($y) ) {
+			throw new InvalidArgumentException(
+				dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument')
+			);
 		}
 		$this->set_Re($x);
 		$this->set_Im($y);
 		$this->set_s($s);
 	}
 	
-	/*
-	 * Alias of set_Re()
+	/**
+	 * Creates a complex from polar coordinates.
+	 * Note: arg will be changed to ]-pi(),pi()], and s will be set.
+	 * 
+	 * @return complex
+	 */
+	static public function polar($r, $theta = NULL)
+	{
+		if ( is_null($theta) ) {
+			$theta = 0;
+		}
+		$c = new static(
+			$r*cos($theta), 
+			$r*sin($theta)
+		);
+		$c->set_s($c->s_theta($theta));
+		return $c;
+	}
+	
+	/**
+	 * Creates a complex from an array.
+	 * @param array a Array( Re, Im [, s] ) -> complex object
+	 * 
+	 * @return complex
+	 */
+	static public function atoc($a, $s = NULL) {
+		if ( isset($a[2]) && is_null($s) ) {
+			$s = $a[2];
+		}
+		$c = new static($a[0], $a[1], $s);
+		return $c;
+	}
+
+	/**
+	 * Get Re().
+	 * 
+	 * @return float Real part
 	 */
 	public function Re()
 	{
 		return $this->set_Re();
 	}
-	
-	/*
-	 *
-	 */
-	public function set_Re($x = NULL)
-	{
-		if ( is_numeric($x) ) {
-			$this->re = $x;
-		}
-		return $this->re;
-	}
-	
-	/*
-	 * Alias of set_Im()
+
+	/**
+	 * Get Im().
+	 * 
+	 * @return float Imaginary part
 	 */
 	public function Im()
 	{
 		return $this->set_Im();
 	}
-	
-	/*
-	 *
+
+	/**
+	 * Get argument.
+	 * 
+	 * @return float
 	 */
-	public function set_Im($x = NULL)
+	public function arg()
 	{
-		if ( is_numeric($x) ) {
-			$this->im = $x;
+		if ( ($this->Re() == 0) && ($this->Im() == 0) ) {
+			return 0;
 		}
-		return $this->im;
+		return atan2($this->Im(), $this->Re());
 	}
 	
-	/*
-	 *
+	/**
+	 * Get "branch".
+	 * 
+	 * @return int current s.
 	 */
 	public function get_s()
 	{
@@ -108,7 +146,10 @@ class Complex implements iComplex
 	}
 	
 	/*
+	 * Set "branch".
 	 *
+	 * @param int s New s.
+	 * @return int current s.
 	 */
 	public function set_s($s = NULL)
 	{
@@ -121,47 +162,11 @@ class Complex implements iComplex
 		return $this->s;
 	}
 	
-	/*
-	 *
-	 */
-	public function abs()
-	{
-		return sqrt(pow($this->Re(),2) + pow($this->Im(),2));
-	}
-	
-	/*
-	 * conjugate
-	 */
-	public function conj()
-	{
-		return new static($this->Re(), -$this->Im(), $this->get_s());
-	}
-	
-	/*
-	 *
-	 */
-	public function arg()
-	{
-		if ( ($this->abs() == 0) ) {
-			return 0;
-		}
-		return atan2($this->Im(), $this->Re());
-	}
-	
-	/*
-	 *
-	 */
-	public function theta($s = NULL)
-	{
-		if ( !is_null($s) ) {
-			#return $this->arg() + 2*pi()*$s;
-			throw new LogicException('invalid call');
-		}
-		return $this->arg() + 2*pi()*$this->get_s();
-	}
-	
-	/*
+	/**
+	 * Get s from angle.
 	 * 
+	 * @param float Angle theta.
+	 * @return int s from theta.
 	 */
 	public function s_theta($theta)
 	{
@@ -175,8 +180,120 @@ class Complex implements iComplex
 		return $s;
 	}
 	
-	/*
+	/**
+	 * Get Angle.
 	 *
+	 * @return float arg() + 2 pi s.
+	 */
+	public function theta()
+	{
+		return $this->arg() + 2*pi()*$this->get_s();
+	}
+	
+	/**
+	 * Get Absolute value.
+	 * 
+	 * @return float |A|.
+	 */
+	public function abs()
+	{
+		#return sqrt(pow($this->Re(),2) + pow($this->Im(),2));
+		return sqrt($this->Re()*$this->Re() + $this->Im()*$this->Im());
+	}
+
+	/**
+	 * Get Conjugate.
+	 * 
+	 * @return complex Complex Re(A)-Im(A)i
+	 */
+	public function conj()
+	{
+		return new static($this->Re(), -$this->Im(), $this->get_s());
+	}
+
+	/**
+	 * Flats the complex to a float if possible.
+	 * 
+	 * @return mixed A float value if Im == 0, or the complex.
+	 */
+	public function flat()
+	{
+		if ( ($this->Im() == 0) ) {
+			return $this->Re();
+		}
+		return $this;
+	}
+
+	/**
+	 * Addition.
+	 * 
+	 * @param complex b
+	 * @return complex A+b.
+	 */
+	public function add($b, $s = NULL)
+	{
+		return static::c_add($this, $b, $s);
+	}
+
+	/**
+	 * Subtraction.
+	 *
+	 * @param complex b
+	 * @return complex A-b.
+	 */
+	public function sub($b, $s = NULL)
+	{
+		return static::c_sub($this, $b, $s);
+	}
+
+	/**
+	 * Multiplication.
+	 *
+	 * @param complex b
+	 * @return complex A*b.
+	 */
+	public function mult($b, $s = NULL)
+	{
+		return static::c_mult($this, $b, $s);
+	}
+
+	/**
+	 * Division.
+	 *
+	 * @param complex b
+	 * @return complex A/b.
+	 */
+	public function div($b, $s = NULL)
+	{
+		return static::c_div($this, $b, $s);
+	}
+
+	/**
+	 * Power.
+	 * 
+	 * @param complex z
+	 * @return complex A ** z.
+	 */
+	public function pow($z, $s = NULL)
+	{
+		return static::c_pow($this, $z, $s);
+	}
+
+	/**
+	 * Power as an array of solutions of A ** z.
+	 * 
+	 * @param complex z
+	 * @return array Array of solutions of A ** z.
+	 */
+	public function apow($z, $s = NULL)
+	{
+		return static::c_apow($this, $z, $s);
+	}
+
+	/**
+	 * Square root.
+	 * 
+	 * @return array Array of roots.
 	 */
 	public function sqrt($s = NULL)
 	{
@@ -198,9 +315,11 @@ class Complex implements iComplex
 			),
 		);
 	}
-	
+
 	/*
-	 *
+	 * Inverse.
+	 * 
+	 * @return complex 1/A.
 	 */
 	public function inv($s = NULL)
 	{
@@ -210,7 +329,8 @@ class Complex implements iComplex
 		if ( ($this->abs() == 0) ) {
 			return new static(0,0,$s);
 		}
-		$r2 = pow($this->abs(),2);
+		#$r2 = pow($this->abs(),2);
+		$r2 = $this->Re()*$this->Re() + $this->Im()*$this->Im();
 		$c = new static(
 			$this->Re()/$r2, 
 			-$this->Im()/$r2,
@@ -218,9 +338,11 @@ class Complex implements iComplex
 		);
 		return $c;
 	}
-	
+
 	/*
-	 *
+	 * Natural logarithm.
+	 * 
+	 * @return complex log(A).
 	 */
 	public function log($s = NULL)
 	{
@@ -234,9 +356,11 @@ class Complex implements iComplex
 		$c->set_s($s);
 		return $c;
 	}
-	
+
 	/**
-	 * @return complex
+	 * Exponential.
+	 * 
+	 * @return complex e**A.
 	 */
 	public function exp()
 	{
@@ -248,46 +372,12 @@ class Complex implements iComplex
 	}
 	
 
-	/*
-	 * @return mixed A float if Im == 0 or the complex.
-	 */
-	public function flat()
-	{
-		if ( ($this->Im() == 0) ) {
-			return $this->Re();
-		}
-		return $this;
-	}
-
-	/*
-	 * arg will be changed to ]-pi(),pi()], and s will be set
-	 */
-	static public function polar($r, $theta = NULL)
-	{
-		if ( is_null($theta) ) {
-			$theta = 0;
-		}
-		$c = new static(
-			$r*cos($theta), 
-			$r*sin($theta)
-		);
-		$c->set_s($c->s_theta($theta));
-		return $c;
-	}
-	
 	/**
-	 * array( $re, $im ) -> complex object
-	 */
-	static public function atoc($a, $s = NULL) {
-		if ( isset($a[2]) && is_null($s) ) {
-			$s = $a[2];
-		}
-		$c = new static($a[0], $a[1], $s);
-		return $c;
-	}
-
-	/*
+	 * Addition.
 	 *
+	 * @param complex a
+	 * @param complex b
+	 * @return complex a+b.
 	 */
 	static public function c_add($a, $b, $s = NULL)
 	{
@@ -308,8 +398,12 @@ class Complex implements iComplex
 		return $c;
 	}
 
-	/*
+	/**
+	 * Subtraction.
 	 *
+	 * @param complex a
+	 * @param complex b
+	 * @return complex a-b.
 	 */
 	static public function c_sub($a, $b, $s = NULL)
 	{
@@ -330,8 +424,12 @@ class Complex implements iComplex
 		return $c;
 	}
 
-	/*
+	/**
+	 * Multiplication.
 	 *
+	 * @param complex a
+	 * @param complex b
+	 * @return complex a*b.
 	 */
 	static public function c_mult($a, $b, $s = NULL)
 	{
@@ -352,8 +450,12 @@ class Complex implements iComplex
 		return $c;
 	}
 
-	/*
+	/**
+	 * Division.
 	 *
+	 * @param complex a
+	 * @param complex b
+	 * @return complex a/b.
 	 */
 	static public function c_div($a, $b, $s = NULL)
 	{
@@ -379,7 +481,11 @@ class Complex implements iComplex
 	}
 
 	/**
-	 * @return complex $a ** $z
+	 * Power.
+	 * 
+	 * @param complex a
+	 * @param complex z
+	 * @return complex a ** z.
 	 */
 	static public function c_pow($a, $z, $s = NULL)
 	{
@@ -416,7 +522,11 @@ class Complex implements iComplex
 
 
 	/**
-	 * @return array
+	 * Power as an array of solutions of w ** z.
+	 * 
+	 * @param complex w
+	 * @param complex z
+	 * @return array Array of solutions of w ** z.
 	 */
 	static public function c_apow($w, $z, $s = NULL)
 	{
@@ -488,8 +598,10 @@ class Complex implements iComplex
 		return $av;
 	}
 	
-	/*
-	 *
+	/**
+	 * __toString()
+	 * 
+	 * @return string
 	 */
 	public function __toString()
 	{
@@ -511,54 +623,31 @@ class Complex implements iComplex
 		return $str; 
 	}
 
-// Object oriented style
-
-	/*
+	/**
+	 * Set Re().
 	 *
+	 * @param float x
+	 * @return float Actual Re().
 	 */
-	public function add($b, $s = NULL)
+	protected function set_Re($x = NULL)
 	{
-		return static::c_add($this, $b, $s);
+		if ( is_numeric($x) ) {
+			$this->re = $x;
+		}
+		return $this->re;
 	}
 
-	/*
+	/**
+	 * Set Im().
 	 *
+	 * @param float x
+	 * @return float Actual Im().
 	 */
-	public function sub($b, $s = NULL)
+	protected function set_Im($x = NULL)
 	{
-		return static::c_sub($this, $b, $s);
+		if ( is_numeric($x) ) {
+			$this->im = $x;
+		}
+		return $this->im;
 	}
-
-	/*
-	 *
-	 */
-	public function mult($b, $s = NULL)
-	{
-		return static::c_mult($this, $b, $s);
-	}
-
-	/*
-	 *
-	 */
-	public function div($b, $s = NULL)
-	{
-		return static::c_div($this, $b, $s);
-	}
-
-	/*
-	 *
-	 */
-	public function pow($z, $s = NULL)
-	{
-		return static::c_pow($this, $z, $s);
-	}
-
-	/*
-	 *
-	 */
-	public function apow($z, $s = NULL)
-	{
-		return static::c_apow($this, $z, $s);
-	}
-
 }

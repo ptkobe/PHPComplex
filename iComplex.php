@@ -5,13 +5,17 @@
 */
 namespace enove\PHPComplex;
 
+/**
+ * Interface iComplex
+ */
 interface iComplex
 {
 	static public function is_complex($a);
 	static public function is_a_complex($a);
 	
 	public function __construct($x = NULL, $y = NULL, $s = NULL);
-	static public function polar($r, $teta = NULL);
+	static public function polar($r, $theta = NULL);
+	static public function atoc($a, $s = NULL);
 
 	public function Re();
 	public function Im();
@@ -19,8 +23,8 @@ interface iComplex
 
 	public function get_s();
 	public function set_s($s = NULL);
-	public function s_theta($teta);
-	public function theta($s = NULL);
+	public function s_theta($theta);
+	public function theta();
 
 	public function abs();
 	public function conj();
@@ -40,8 +44,6 @@ interface iComplex
 	public function log($s = NULL);
 	public function exp();
 
-	static public function atoc($a, $s = NULL);
-
 	static public function c_add($a, $b, $s = NULL);
 	static public function c_sub($a, $b, $s = NULL);
 	static public function c_mult($a, $b, $s = NULL);
@@ -51,6 +53,6 @@ interface iComplex
 
 	public function __toString();
 
-	#public function set_Re($x = NULL);
-	#public function set_Im($x = NULL);
+	#protected function set_Re($x = NULL);
+	#protected function set_Im($x = NULL);
 }

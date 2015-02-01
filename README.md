@@ -53,7 +53,7 @@ Optionally create your own class extending **Complex** and set `PHPCOMPLEX_CLASS
 
 ## To do
 
-phpDoc documentation
+phpDoc documentation (50%)
 
 
 
