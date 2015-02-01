@@ -2,7 +2,9 @@
 
 Complex Vector and polar definitions with "branches".
 
-Elementary complex numbers operations, plus `$a->log()`, `$a->exp()` and `$a->pow($z)`.
+Elementary complex numbers operations (add, sub, mult, div), and:
+
+ `$a->Re()`, `$a->Im()`, `$a->arg()`, `$a->theta()`, `$a->abs()`, `$a->conj()`, `$a->inv()`, `$a->log()`, `$a->exp()`, `$a->pow($z)`, `$a->sqrt()`.
 
 Namespace: `enove\PHPComplex`
 

@@ -74,22 +74,22 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(atan(4/3), $a->arg());
 	}
 
-	public function testNew_Teta ()
+	public function testNew_Theta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4, 2);
 
 		// Assert
-		$this->assertEquals(2*2*pi()+atan(4/3), $a->teta());
+		$this->assertEquals(2*2*pi()+atan(4/3), $a->theta());
 	}
 
-	public function testPolar_Teta ()
+	public function testPolar_Theta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = $class::polar(5, 2*2*pi()+atan(4/3));
 
 		// Assert
-		$this->assertEquals(2*2*pi()+atan(4/3), $a->teta());
+		$this->assertEquals(2*2*pi()+atan(4/3), $a->theta());
 	}
 
 	public function testNew_Re ()
@@ -164,22 +164,22 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(0, $a->arg());
 	}
 
-	public function testNew0_Teta ()
+	public function testNew0_Theta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(0, 0, 2);
 
 		// Assert
-		$this->assertEquals(2*pi()*2, $a->teta());
+		$this->assertEquals(2*pi()*2, $a->theta());
 	}
 
-	public function testPolar0_Teta ()
+	public function testPolar0_Theta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = $class::polar(0, 2*2*pi());
 
 		// Assert
-		$this->assertEquals(2*pi()*2, $a->teta());
+		$this->assertEquals(2*pi()*2, $a->theta());
 	}
 
 	public function testNew_NULL_0 ()
@@ -244,21 +244,21 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(4, $a->get_s());
 	}
 
-	public function testTeta_SetS ()
+	public function testTheta_SetS ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4, 2);
 		$a->set_s(4);
 
 		// Assert
-		$this->assertEquals(4*2*pi()+atan(4/3), $a->teta());
+		$this->assertEquals(4*2*pi()+atan(4/3), $a->theta());
 	}
 
-	public function testArg_SetSTeta ()
+	public function testArg_SetSTheta ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4, 3);
-		$a->set_s($a->s_teta( 4*2*pi()+atan(4/3) ));
+		$a->set_s($a->s_theta( 4*2*pi()+atan(4/3) ));
 
 		// Assert
 		$this->assertEquals(atan(4/3), $a->arg());
@@ -273,22 +273,22 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(2, $a->get_s());
 	}
 
-	public function testTeta_NullS ()
+	public function testTheta_NullS ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4);
 
 		// Assert
-		$this->assertEquals(atan(4/3), $a->teta());
+		$this->assertEquals(atan(4/3), $a->theta());
 	}
 
-	public function testTetaArg_NullS ()
+	public function testThetaArg_NullS ()
 	{
 		$class = PHPCOMPLEX_CLASS;
 		$a = new $class(3, 4);
 
 		// Assert
-		$this->assertEquals($a->arg(), $a->teta());
+		$this->assertEquals($a->arg(), $a->theta());
 	}
 
 /* +, -, *, / */

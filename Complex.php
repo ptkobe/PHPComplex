@@ -1,6 +1,7 @@
 <?php
 /**
 * @package PHPComplex
+* File Complex.php
 */
 namespace enove\PHPComplex;
 
@@ -25,7 +26,7 @@ class Complex implements iComplex
 	/**
 	 *
 	 */
-	static function is_complex ($a)
+	static public function is_complex($a)
 	{
 		return is_object($a) && (get_class($a) == get_called_class());
 	}
@@ -33,7 +34,7 @@ class Complex implements iComplex
 	/**
 	 *
 	 */
-	static function is_a_complex ($a)
+	static public function is_a_complex($a)
 	{
 		return is_a($a, get_called_class());
 	}
@@ -41,7 +42,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function __construct ($x = NULL, $y = NULL, $s = NULL)
+	public function __construct($x = NULL, $y = NULL, $s = NULL)
 	{
 		if ( is_null($x) ) {
 			$x = 0;
@@ -63,7 +64,7 @@ class Complex implements iComplex
 	/*
 	 * Alias of set_Re()
 	 */
-	function Re ()
+	public function Re()
 	{
 		return $this->set_Re();
 	}
@@ -71,7 +72,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function set_Re ($x = NULL)
+	public function set_Re($x = NULL)
 	{
 		if ( is_numeric($x) ) {
 			$this->re = $x;
@@ -82,7 +83,7 @@ class Complex implements iComplex
 	/*
 	 * Alias of set_Im()
 	 */
-	function Im ()
+	public function Im()
 	{
 		return $this->set_Im();
 	}
@@ -90,7 +91,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function set_Im ($x = NULL)
+	public function set_Im($x = NULL)
 	{
 		if ( is_numeric($x) ) {
 			$this->im = $x;
@@ -101,7 +102,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function get_s ()
+	public function get_s()
 	{
 		return $this->set_s();
 	}
@@ -109,7 +110,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function set_s ($s = NULL)
+	public function set_s($s = NULL)
 	{
 		if ( !is_null($s) ) {
 			if ( !is_int($s) ) {
@@ -123,7 +124,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function abs ()
+	public function abs()
 	{
 		return sqrt(pow($this->Re(),2) + pow($this->Im(),2));
 	}
@@ -131,7 +132,7 @@ class Complex implements iComplex
 	/*
 	 * conjugate
 	 */
-	function conj ()
+	public function conj()
 	{
 		return new static($this->Re(), -$this->Im(), $this->get_s());
 	}
@@ -139,7 +140,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function arg ()
+	public function arg()
 	{
 		if ( ($this->abs() == 0) ) {
 			return 0;
@@ -150,7 +151,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function teta ($s = NULL)
+	public function theta($s = NULL)
 	{
 		if ( !is_null($s) ) {
 			#return $this->arg() + 2*pi()*$s;
@@ -162,10 +163,10 @@ class Complex implements iComplex
 	/*
 	 * 
 	 */
-	function s_teta ($teta)
+	public function s_theta($theta)
 	{
 		$max_s_error = 1e-4;
-		$st = ( $teta - $this->arg() )/2/pi();
+		$st = ( $theta - $this->arg() )/2/pi();
 		$s = (int) round($st);
 		if ( (abs($st - $s) > $max_s_error) ) {
 			#throw new LogicException('invalid s');
@@ -177,7 +178,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function sqrt ($s = NULL)
+	public function sqrt($s = NULL)
 	{
 		if ( is_null($s) ) {
 			$s = $this->get_s();
@@ -201,7 +202,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function inv ($s = NULL)
+	public function inv($s = NULL)
 	{
 		if ( is_null($s) ) {
 			$s = $this->get_s();
@@ -221,11 +222,11 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function log ($s = NULL)
+	public function log($s = NULL)
 	{
 		$c = new static(
 			log($this->abs()), 
-			$this->teta()
+			$this->theta()
 		);
 		if ( is_null($s) ) {
 			$s = $this->get_s();
@@ -237,7 +238,7 @@ class Complex implements iComplex
 	/**
 	 * @return complex
 	 */
-	function exp ()
+	public function exp()
 	{
 		$c = static::polar(
 			exp($this->Re()), 
@@ -250,7 +251,7 @@ class Complex implements iComplex
 	/*
 	 * @return mixed A float if Im == 0 or the complex.
 	 */
-	function flat ()
+	public function flat()
 	{
 		if ( ($this->Im() == 0) ) {
 			return $this->Re();
@@ -261,23 +262,23 @@ class Complex implements iComplex
 	/*
 	 * arg will be changed to ]-pi(),pi()], and s will be set
 	 */
-	static function polar ($r, $teta = NULL)
+	static public function polar($r, $theta = NULL)
 	{
-		if ( is_null($teta) ) {
-			$teta = 0;
+		if ( is_null($theta) ) {
+			$theta = 0;
 		}
 		$c = new static(
-			$r*cos($teta), 
-			$r*sin($teta)
+			$r*cos($theta), 
+			$r*sin($theta)
 		);
-		$c->set_s($c->s_teta($teta));
+		$c->set_s($c->s_theta($theta));
 		return $c;
 	}
 	
 	/**
 	 * array( $re, $im ) -> complex object
 	 */
-	static function atoc ($a, $s = NULL) {
+	static public function atoc($a, $s = NULL) {
 		if ( isset($a[2]) && is_null($s) ) {
 			$s = $a[2];
 		}
@@ -288,7 +289,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	static function c_add ($a, $b, $s = NULL)
+	static public function c_add($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
 			$a = new static($a, NULL, $s);
@@ -310,7 +311,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	static function c_sub ($a, $b, $s = NULL)
+	static public function c_sub($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
 			$a = new static($a, NULL, $s);
@@ -332,7 +333,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	static function c_mult ($a, $b, $s = NULL)
+	static public function c_mult($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
 			$a = new static($a, NULL, $s);
@@ -345,7 +346,7 @@ class Complex implements iComplex
 			$a->Im()*$b->Re()+$a->Re()*$b->Im()
 		);
 		if ( is_null($s) ) {
-			$s = $c->s_teta( $a->teta() + $b->teta() );
+			$s = $c->s_theta( $a->theta() + $b->theta() );
 		}
 		$c->set_s($s);
 		return $c;
@@ -354,7 +355,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	static function c_div ($a, $b, $s = NULL)
+	static public function c_div($a, $b, $s = NULL)
 	{
 		if ( !static::is_complex($a) ) {
 			$a = new static($a, NULL, $s);
@@ -371,7 +372,7 @@ class Complex implements iComplex
 			($a->Im()*$b->Re()-$a->Re()*$b->Im())/$r2b
 		);
 		if ( is_null($s) ) {
-			$s = $c->s_teta( $a->teta() - $b->teta() );
+			$s = $c->s_theta( $a->theta() - $b->theta() );
 		}
 		$c->set_s($s);
 		return $c;
@@ -380,7 +381,7 @@ class Complex implements iComplex
 	/**
 	 * @return complex $a ** $z
 	 */
-	static function c_pow ($a, $z, $s = NULL)
+	static public function c_pow($a, $z, $s = NULL)
 	{
 		$av = static::c_apow($a, $z, $s);
 		reset($av);
@@ -417,15 +418,15 @@ class Complex implements iComplex
 	/**
 	 * @return array
 	 */
-	static function c_apow ($w, $z, $s = NULL)
+	static public function c_apow($w, $z, $s = NULL)
 	{
 		$a = clone($w);
 		$sa = $a->get_s();
 		#echo 'c_apow a ',$a,"\n";
 
-		#$r_v = pow($a->abs(), $z->Re()) * exp(-$z->Im() * ( $a->teta() + 2*pi()*$k ));
-		#$teta_v = $z->Im() * log($a->abs()) + $z->Re() * ( $a->teta() + 2*pi()*$k );
-		#$v = c_polar($r_v, $teta_v);
+		#$r_v = pow($a->abs(), $z->Re()) * exp(-$z->Im() * ( $a->theta() + 2*pi()*$k ));
+		#$theta_v = $z->Im() * log($a->abs()) + $z->Re() * ( $a->theta() + 2*pi()*$k );
+		#$v = c_polar($r_v, $theta_v);
 
 		if ( ( $a->abs() == 0 ) ) {
 			$av = array( 
@@ -442,10 +443,10 @@ class Complex implements iComplex
 				return $av;
 			}
 			
-			$r_v = exp(-$z->Im() * $a->teta());
-			$teta_v = $z->Im() * log($a->abs());
+			$r_v = exp(-$z->Im() * $a->theta());
+			$theta_v = $z->Im() * log($a->abs());
 			$av = array( 
-				0 => static::polar($r_v, $teta_v)
+				0 => static::polar($r_v, $theta_v)
 			);
 			return $av;
 		}
@@ -461,7 +462,7 @@ class Complex implements iComplex
 		#echo 'c_apow 1/abs(c) ',1/abs($z->Re()),"\n";
 		#echo 'c_apow s ',$s,"\n";
 
-		$tv = ( $z->Im() * log($a->abs()) + $z->Re() * $a->teta() )/(2*pi()); 
+		$tv = ( $z->Im() * log($a->abs()) + $z->Re() * $a->theta() )/(2*pi()); 
 		if ( ( $z->Re() > 0 ) ) {
 			$k = (int) floor( (-$tv + $s - 1/2)/$z->Re() ) + 1;
 		} else {
@@ -490,7 +491,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	public function __toString ()
+	public function __toString()
 	{
 		#$format='%13.5g';
 		$format='%.5g';
@@ -515,7 +516,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function add($b, $s = NULL)
+	public function add($b, $s = NULL)
 	{
 		return static::c_add($this, $b, $s);
 	}
@@ -523,7 +524,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function sub($b, $s = NULL)
+	public function sub($b, $s = NULL)
 	{
 		return static::c_add($this, $b, $s);
 	}
@@ -531,7 +532,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function mult($b, $s = NULL)
+	public function mult($b, $s = NULL)
 	{
 		return static::c_add($this, $b, $s);
 	}
@@ -539,7 +540,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function div($b, $s = NULL)
+	public function div($b, $s = NULL)
 	{
 		return static::c_add($this, $b, $s);
 	}
@@ -547,7 +548,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function pow($z, $s = NULL)
+	public function pow($z, $s = NULL)
 	{
 		return static::c_pow($this, $z, $s);
 	}
@@ -555,7 +556,7 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	function apow($z, $s = NULL)
+	public function apow($z, $s = NULL)
 	{
 		return static::c_apow($this, $z, $s);
 	}
