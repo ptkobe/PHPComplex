@@ -515,19 +515,49 @@ class Complex implements iComplex
 	/*
 	 *
 	 */
-	/*
-	function add ($b, $s = NULL)
+	function add($b, $s = NULL)
 	{
 		return static::c_add($this, $b, $s);
 	}
-	*/
 
 	/*
 	 *
 	 */
-	function pow ($z, $s = NULL)
+	function sub($b, $s = NULL)
+	{
+		return static::c_add($this, $b, $s);
+	}
+
+	/*
+	 *
+	 */
+	function mult($b, $s = NULL)
+	{
+		return static::c_add($this, $b, $s);
+	}
+
+	/*
+	 *
+	 */
+	function div($b, $s = NULL)
+	{
+		return static::c_add($this, $b, $s);
+	}
+
+	/*
+	 *
+	 */
+	function pow($z, $s = NULL)
 	{
 		return static::c_pow($this, $z, $s);
+	}
+
+	/*
+	 *
+	 */
+	function apow($z, $s = NULL)
+	{
+		return static::c_apow($this, $z, $s);
 	}
 
 }

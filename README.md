@@ -8,7 +8,7 @@ Namespace: `enove\PHPComplex`
 
 (for PHP 5)
 
-## Usage
+## Quick Start
 
 ### include '*Complex.php*':
 
@@ -40,11 +40,13 @@ or
 ```
  
 ## More
-Optionally include '*c_functions.php*' if you want the procedural style functions.
+See **Example** (`example/example.php`).
 
-See **iComplex** interface (*iComplex.php*)
+Optionally include `c_functions.php` if you want the procedural style functions.
 
-See **PHPUnit** test (*tests/PHPComplexTest.php*)
+See **iComplex** interface (`iComplex.php`).
+
+See **PHPUnit** test (`tests/PHPComplexTest.php`).
 
 Optionally create your own class extending **Complex** and set `PHPCOMPLEX_CLASS` accordingly.
 
