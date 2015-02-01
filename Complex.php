@@ -526,7 +526,7 @@ class Complex implements iComplex
 	 */
 	public function sub($b, $s = NULL)
 	{
-		return static::c_add($this, $b, $s);
+		return static::c_sub($this, $b, $s);
 	}
 
 	/*
@@ -534,7 +534,7 @@ class Complex implements iComplex
 	 */
 	public function mult($b, $s = NULL)
 	{
-		return static::c_add($this, $b, $s);
+		return static::c_mult($this, $b, $s);
 	}
 
 	/*
@@ -542,7 +542,7 @@ class Complex implements iComplex
 	 */
 	public function div($b, $s = NULL)
 	{
-		return static::c_add($this, $b, $s);
+		return static::c_div($this, $b, $s);
 	}
 
 	/*
