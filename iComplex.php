@@ -14,6 +14,7 @@ interface iComplex
 	const PHPCOMPLEX_MODE_POLAR  = 1;
 
 	public function __construct($x = NULL, $y = NULL, $s = NULL);
+	static public function c_coords($x = NULL, $y = NULL, $s = NULL);
 	static public function c_polar($r, $theta = NULL, $umode = NULL);
 	static public function c_upolar($r, $utheta = NULL);
 	static public function atoc($a, $s = NULL);
