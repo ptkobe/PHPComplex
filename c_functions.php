@@ -12,6 +12,12 @@ function is_complex($a)
 	return Complex::$method($a);
 }
 
+function c_coords($x, $y = NULL, $s = NULL)
+{
+	$method = __FUNCTION__;
+	return Complex::$method($a);
+}
+
 function c_polar($r, $theta = NULL)
 {
 	$method = __FUNCTION__;

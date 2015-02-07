@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PHPComplex\n"
-"POT-Creation-Date: 2015-01-31 23:03+0100\n"
-"PO-Revision-Date: 2015-01-31 23:03+0100\n"
+"POT-Creation-Date: 2015-02-07 03:09+0100\n"
+"PO-Revision-Date: 2015-02-07 03:10+0100\n"
 "Last-Translator: ptkobe <incineracao@gmail.com>\n"
 "Language-Team: enove <luis.barbas@gmail.com>\n"
 "Language: en_US\n"
@@ -15,10 +15,23 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: Complex.php:56
+#: Complex.php:87
+msgid "invalid mode"
+msgstr "invalid mode"
+
+#: Complex.php:151 Complex.php:159 Complex.php:187 Complex.php:195
 msgid "invalid argument"
 msgstr "invalid argument"
 
-#: Complex.php:367
-msgid "invalid result"
-msgstr "invalid result"
+#: Complex.php:167 Complex.php:218 Complex.php:256 Complex.php:301
+#: Complex.php:326 Complex.php:372 Complex.php:393 Complex.php:435
+#: Complex.php:468 Complex.php:501 Complex.php:545 Complex.php:699
+msgid "invalid branch"
+msgstr "invalid branch"
+
+#: Complex.php:1109
+msgid "trying to set invalid arg value"
+msgstr "trying to set invalid Arg value"
+
+#~ msgid "invalid result"
+#~ msgstr "invalid result"

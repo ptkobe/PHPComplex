@@ -7,7 +7,7 @@ Elementary complex numbers operations (add, sub, mult, div), and:
 
 Namespace: `enove\PHPComplex`.
 
-(for PHP 5)
+Release 0.1 (for PHP 5)
 
 ## Quick Start
 
@@ -59,8 +59,6 @@ Optionally include `c_functions.php` if you want the procedural style functions.
 See **iComplex** interface (`iComplex.php`).
 
 See **PHPUnit** test (`tests/PHPComplexTest.php`).
-
-Optionally create your own class extending **Complex** and set `PHPCOMPLEX_CLASS` accordingly.
 
 ## To do
 

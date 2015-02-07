@@ -91,15 +91,28 @@ class Complex implements iComplex
 	}
 
 	/**
+	 * Creates a complex from plane coordinates.
+	 * 
+	 * @param float (Optional) Real part. Default: 0.
+	 * @param float (Optional) Imaginary part. Default: 0.
+	 * @param int   (Optional) Branch. Default: 0.
+	 * @return object Complex
+	 */
+	static public function c_coords($x = NULL, $y = NULL, $s = NULL)
+	{
+		return new static($x, $y, $s, self::PHPCOMPLEX_MODE_COORDS);
+	}
+
+	/**
 	 * Creates a polar complex from radius and angle.
 	 * Note: Arg will be set to ]-pi(),pi()], and branch will be set.
 	 * 
-	 * @param float Radius.
+	 * @param float Radius. Default: 0.
 	 * @param float (Optional) Angle. Default: 0.
 	 * @param bool  (Optional) unitary flag. Default: FALSE.
 	 * @return object Complex
 	 */
-	static public function c_polar($r, $theta = NULL, $umode = NULL)
+	static public function c_polar($r = NULL, $theta = NULL, $umode = NULL)
 	{
 		return new static($r, $theta, $umode, self::PHPCOMPLEX_MODE_POLAR);
 	}
