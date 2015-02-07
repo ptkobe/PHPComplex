@@ -4,64 +4,59 @@
 * File c_functions.php
 */
 
+use enove\PHPComplex\Complex;
+
 function is_complex($a)
 {
-	$class = PHPCOMPLEX_CLASS;
-	return $class::is_complex($a);
+	$method = __FUNCTION__;
+	return Complex::$method($a);
 }
 
-function c_polar($r, $ang = NULL)
+function c_polar($r, $theta = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
-	return $class::polar($r, $ang);
+	$method = __FUNCTION__;
+	return Complex::$method($r, $theta);
 }
 
 function atoc($a, $s = NULL) {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $s);
+	return Complex::$method($a, $s);
 }
 
 function c_add($a, $b, $s = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $b, $s);
+	return Complex::$method($a, $b, $s);
 }
 
 function c_sub($a, $b, $s = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $b, $s);
+	return Complex::$method($a, $b, $s);
 }
 
 function c_mult($a, $b, $s = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $b, $s);
+	return Complex::$method($a, $b, $s);
 }
 
 function c_div($a, $b, $s = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $b, $s);
+	return Complex::$method($a, $b, $s);
 }
 
 function c_pow($a, $z, $s = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $z, $s);
+	return Complex::$method($a, $z, $s);
 }
 
 function c_apow($a, $z, $s = NULL)
 {
-	$class = PHPCOMPLEX_CLASS;
 	$method = __FUNCTION__;
-	return $class::$method($a, $z, $s);
+	return Complex::$method($a, $z, $s);
 }
 
 // Procedural type style

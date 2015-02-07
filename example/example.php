@@ -1,29 +1,25 @@
 <?php
 namespace foo;
-
 use enove\PHPComplex\Complex;
-require_once '../Complex.php';
 
-#require_once '../c_functions.php';
+require_once __DIR__.'/../autoloader.php';
 
-$class = PHPCOMPLEX_CLASS;
+	#require_once '../c_functions.php';
 
-$w = new $class(3, 4, 2);
-$z = new $class(-1/3, 0.1);
+$w = new Complex(0, 4, 3);
+#$w = Complex::c_polar(4, 3*2*pi()+1/2*pi());
+#$w = Complex::c_upolar(4, 3.25);
+$z = new Complex(-1/3, 0.1);
 
-echo 'Complex exponents with complex bases example:',"\n";
-
-echo 'v = w ** z:',"\n";
+echo 'Complex exponents with complex bases example: v = w ** z',"\n";
 echo 'w = ',$w,"\n";
 echo 'z = ',$z,"\n";
-echo "\n";
 
 $v = $w->pow($z);
 echo 'v = ',$v,"\n";
 echo "\n";
 
-echo 'VERIFY:',"\n";
-echo 'w2 = w = v ** (1/z):',"\n";
+echo 'VERIFY w = v ** (1/z) = w2:',"\n";
 
 $zinv = $z->inv();
 echo '1/z = ',$zinv,"\n";
@@ -33,7 +29,7 @@ echo "\n";
 echo "\n";
 
 
-$n = $v->get_s();
+$n = $v->branch();
 echo 'Now, for all the results av = { v = w ** z } on default branch '.$n.':',"\n";
 
 $av = $w->apow($z, $n);
@@ -48,8 +44,8 @@ echo "\n";
 echo "\n";
 
 
-$n = 0;
-echo 'And for all the results av = { v = w ** z } on branch '.$n.':',"\n";;
+$n++;
+echo 'And for all the results av = { v = w ** z } on branch, say, '.$n.':',"\n";;
 
 $av = $w->apow($z, $n);
 echo 'av = { ',"\n";
@@ -66,12 +62,16 @@ echo "\n";
 
 echo 'Let\'s end with a simple multiplication:',"\n";;
 $a = new Complex(3, 4);
-$b = Complex::polar(1, 2*pi()/3);
+
+$b = Complex::c_polar(1, 2*pi()/3);
+	#$b = c_polar(1, 2*pi()/3);
+
 echo 'a = ',$a,"\n";
 echo 'b = ',$b,"\n";
 
 echo 'y = a * b:',"\n";
-$y = Complex::c_mult($a, $b);
+$y = $a->mult($b);
+	#$y = c_mult($a,$b);
 echo 'y = ',$y, "\n";
 
 echo "\n";

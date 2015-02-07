@@ -1,6 +1,6 @@
 # PHPComplex
 
-Complex Vector and polar definitions with "branches".
+Complex vector and polar definitions with "branches".
 
 Elementary complex numbers operations (add, sub, mult, div), and:
  `$a->Re()`, `$a->Im()`, `$a->arg()`, `$a->theta()`, `$a->abs()`, `$a->conj()`, `$a->inv()`, `$a->log()`, `$a->exp()`, `$a->pow($z)`, `$a->sqrt()`.
@@ -16,8 +16,9 @@ Namespace: `enove\PHPComplex`.
 ```php
 require_once '<path>/Complex.php';
 ```
+or use an autoloader.
 
-### set namespace:
+### set namespace use:
 
 ```php
 use enove\PHPComplex\Complex;
@@ -28,10 +29,20 @@ use enove\PHPComplex\Complex;
 ```php
  $w = new Complex(3, 4);
 ``` 
-or
+or:
 
 ```php
- $w = Complex::polar(1, pi()/3);
+ $w = Complex::c_polar(1, pi()/3);
+```
+or:
+
+```php
+ $w = Complex::c_upolar(1, 1/6);
+```
+or, if you include `c_functions.php`:
+
+```php
+ $w = c_polar(1, pi()/3);
 ```
 
 ### print a complex:
@@ -53,7 +64,8 @@ Optionally create your own class extending **Complex** and set `PHPCOMPLEX_CLASS
 
 ## To do
 
-phpDoc documentation (50%)
+phpDoc documentation (75%)
 
+Test Unit (25%)
 
 
