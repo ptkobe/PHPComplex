@@ -3,11 +3,11 @@
 Complex vector and polar definitions with "branches".
 
 Elementary complex numbers operations (add, sub, mult, div), and:
- `$a->Re()`, `$a->Im()`, `$a->arg()`, `$a->theta()`, `$a->abs()`, `$a->conj()`, `$a->inv()`, `$a->log()`, `$a->exp()`, `$a->pow($z)`, `$a->sqrt()`.
+ `$a->Re()`, `$a->Im()`, `$a->arg()`, `$a->theta()`, `$a->abs()`, `$a->conj()`, `$a->inv()`, `$a->uminus()`, `$a->sqrt()`, `$a->log()`, `$a->exp()`, `$a->pow($z)`.
 
 Namespace: `enove\PHPComplex`.
 
-Release 0.1-dev (for PHP 5)
+Release 0.1.1 (for PHP 5)
 
 ## Quick Start
 

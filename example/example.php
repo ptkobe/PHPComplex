@@ -39,7 +39,7 @@ foreach ($av as $va) {
 }
 echo '}',"\n";
 
-echo 'Note 1: only if |Re(z)| < 1 there\'s more than one result for apow().',"\n";
+echo 'Note 1: only if |Re(z)| < 1 it may be more than one result for apow().',"\n";
 echo "\n";
 echo "\n";
 
@@ -53,9 +53,7 @@ foreach ($av as $va) {
 	echo ' ',$va,"\n";
 }
 echo '}',"\n";
-
-echo 'Note 2: In some circumstances there will be no results for the chosen branch.',"\n";
-echo '        Then, the next available result for the following branches will be shown.',"\n";
+echo 'Note 2: In certain circumstances there will be no results for the chosen branch.',"\n";
 echo "\n";
 echo "\n";
 

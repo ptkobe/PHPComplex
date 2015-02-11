@@ -80,7 +80,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(2*pi()*2-pi(), $a->theta());
 
 		$a = Complex::c_polar(5);
-		$t = new Complex(5,0,0);
+		#$t = new Complex(5,0,0);
 		$this->assertEquals(5, $a->abs());
 		$this->assertEquals(5, $a->Re());
 		$this->assertEquals(0, $a->Im());
@@ -88,64 +88,203 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		#$this->assertEquals($t, $a);
 	}
 
-/* Arg, Teta and S */
+/* branch */
 
-	public function testGetS_SetS ()
+	public function testMinusConjInvMinusBranch ()
 	{
+		
+		$a = new Complex(-2,0);
+		$this->assertEquals(pi(), $a->arg());
+		$this->assertEquals(0, $a->branch());
+		$this->assertEquals(-1, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(0, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-1, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-1, $b->branch());
+		$this->assertEquals(0, $b->uminus_branch());
+
+		$a = new Complex(2,0,3);
+		$this->assertEquals(0, $a->arg());
+		$this->assertEquals(3, $a->branch());
+		$this->assertEquals(-3, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(3, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$this->assertEquals(3, $b->uminus_branch());
+
+		$a = new Complex(-2,0,3);
+		$this->assertEquals(pi(), $a->arg());
+		$this->assertEquals(3, $a->branch());
+		$this->assertEquals(-4, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(3, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-4, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-4, $b->branch());
+		$this->assertEquals(3, $b->uminus_branch());
+
+		$a = new Complex(-2,2,3);
+		$this->assertEquals(3/4*pi(), $a->arg());
+		$this->assertEquals(3, $a->branch());
+		$this->assertEquals(-3, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(-1/4*pi(), $b->arg());
+		$this->assertEquals(3, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(-3/4*pi(), $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(-3/4*pi(), $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$this->assertEquals(3, $b->uminus_branch());
+
+		$a = Complex::c_upolar(2,0.5);
+		$this->assertEquals(pi(), $a->arg());
+		$this->assertEquals(0, $a->branch());
+		$this->assertEquals(-1, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(0, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-1, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-1, $b->branch());
+		$this->assertEquals(0, $b->uminus_branch());
+
+		$a = Complex::c_upolar(2,1);
+		$this->assertEquals(0, $a->arg());
+		$this->assertEquals(1, $a->branch());
+		$this->assertEquals(-1, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(1, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(-1, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(-1, $b->branch());
+		$this->assertEquals(1, $b->uminus_branch());
+
+		$a = Complex::c_upolar(2,2.5);
+		$this->assertEquals(pi(), $a->arg());
+		$this->assertEquals(2, $a->branch());
+		$this->assertEquals(-3, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(0, $b->arg());
+		$this->assertEquals(2, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(pi(), $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$this->assertEquals(2, $b->uminus_branch());
+
+		$a = Complex::c_upolar(2,3.375);
+		$this->assertEquals(3/4*pi(), $a->arg());
+		$this->assertEquals(3, $a->branch());
+		$this->assertEquals(-3, $a->uminus_branch());
+		$b = $a->uminus();
+		$this->assertEquals(-1/4*pi(), $b->arg());
+		$this->assertEquals(3, $b->branch());
+		$b = $a->conj();
+		$this->assertEquals(-3/4*pi(), $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$b = $a->inv();
+		$this->assertEquals(-3/4*pi(), $b->arg());
+		$this->assertEquals(-3, $b->branch());
+		$this->assertEquals(3, $b->uminus_branch());
+	}
+
+	public function testBranchOfu ()
+	{
+		$this->assertEquals(-1, Complex::branch_ofu(-.5));
+		$this->assertEquals(-1, Complex::branch_ofu(-.51));
+		$this->assertEquals(0, Complex::branch_ofu(-.49));
+		$this->assertEquals(0, Complex::branch_ofu(.5));
+		$this->assertEquals(1, Complex::branch_ofu(.51));
+		$this->assertEquals(0, Complex::branch_ofu(.49));
+		$this->assertEquals(-1, Complex::branch_ofu(-1));
+		$this->assertEquals(-2, Complex::branch_ofu(-1.5));
+		$this->assertEquals(1, Complex::branch_ofu(1));
+		$this->assertEquals(1, Complex::branch_ofu(1.5));
+	}
+
+/* Arg, Teta and Branch */
+
+	public function testBranch ()
+	{
+		$a = new Complex(3, 4);
+		$this->assertEquals(atan(4/3), $a->theta());
+		$a->set_Re(0);
+		$this->assertEquals(pi()/2, $a->theta());
+		$a->set_Im(0);
+		$this->assertEquals(0, $a->theta());
+
+		$a = new Complex(3, 4);
+		$this->assertEquals(atan(4/3), $a->theta());
+		$a->set_abs(0);
+		$this->assertEquals(0, $a->theta());
+		$this->assertEquals(0, $a->Re());
+		$this->assertEquals(0, $a->Im());
+
+		$a = new Complex(3, 4);
+		$this->assertEquals(atan(4/3), $a->theta());
+		$a->set_theta(0);
+		$this->assertEquals(5, $a->abs());
+		$this->assertEquals(0, $a->theta());
+		$this->assertEquals(5, $a->Re());
+		$this->assertEquals(0, $a->Im());
+
+		$a = new Complex(3, 4);
+		$this->assertEquals(atan(4/3), $a->theta());
+		$a->set_theta(acos(0));
+		$this->assertEquals(5, $a->abs());
+		$this->assertEquals(pi()/2, $a->theta());
+		$this->assertEquals(0, $a->Re());
+		$this->assertEquals(5, $a->Im());
+
+		$a = new Complex(3, 4);
+		$this->assertEquals(atan(4/3), $a->theta());
+		$this->assertEquals($a->arg(), $a->theta());
+
 		$a = new Complex(3, 4, 2);
 		$a->set_branch(4);
-
-		// Assert
 		$this->assertEquals(4, $a->branch());
-	}
-
-	public function testTheta_SetS ()
-	{
-		$a = new Complex(3, 4, 2);
-		$a->set_branch(4);
-
-		// Assert
 		$this->assertEquals(4*2*pi()+atan(4/3), $a->theta());
-	}
 
-	public function testArg_SetSTheta ()
-	{
 		$a = new Complex(3, 4, 3);
-		$a->set_branch($a->branch( 4*2*pi()+atan(4/3) ));
-
-		// Assert
+		$a->set_branch($a->branch_of( 4*pi() ));
 		$this->assertEquals(atan(4/3), $a->arg());
-	}
+		$this->assertEquals(2, $a->branch());
 
-	public function testGetS_Polar ()
-	{
 		$a = Complex::c_polar(5, 2*2*pi()+atan(4/3));
-
-		// Assert
 		$this->assertEquals(2, $a->branch());
 	}
 
-	public function testTheta_NullS ()
+/* +, -, *, / */
+
+	public function testDiv_Results()
 	{
-		$a = new Complex(3, 4);
-
-		// Assert
-		$this->assertEquals(atan(4/3), $a->theta());
-	}
-
-	public function testThetaArg_NullS ()
-	{
-		$a = new Complex(3, 4);
-
-		// Assert
-		$this->assertEquals($a->arg(), $a->theta());
-	}
-
-/* +, -, *, / */ // @expectedException DomainException
-
-	public function testDiv_Arguments()
-	{
-		#$err = 1e-15;
+		$err = 1e-12;
 
 		$a = 8;
 		$b = new Complex(2, 0);
@@ -153,13 +292,11 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$t = new Complex(4, 0, 0);
 		$this->assertTrue(Complex::is_equal($t,$r,0,TRUE), '');
 
-		$a = new Complex(2, 0, 2);
-		$b = new Complex(0, 0, 2);
-		@$r = Complex::c_div($a,$b);
-
-		$a = new Complex(0, 0, 2);
-		$b = new Complex(0, 0, 2);
-		@$r = Complex::c_div($a,$b);
+		$a = new Complex(8, 0, 2);
+		$b = new Complex(2, 0, 2);
+		$r = $a->div($b);
+		$t = new Complex(4, 0, 0);
+		$this->assertTrue(Complex::is_equal($t,$r,$err,TRUE), '');
 	}
 
 	public function testDivArguments_Error()
@@ -176,7 +313,8 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	public function testDivArguments_Error_2()
 	{
 		$this->setExpectedException(
-			'PHPUnit_Framework_Error_Warning'
+			#'InvalidArgumentException', 'Right Message'
+			'InvalidArgumentException'
 		);
 		$a = new Complex(2, 0, 2);
 		$b = new Complex(0, 0, 2);
@@ -184,43 +322,34 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		#echo var_dump($r);
 	}
 
-	public function testDiv_Results()
+	public function testDivArguments_Error_3()
 	{
-		$err = 1e-12;
-
-		$a = new Complex(8, 0, 2);
-		$b = new Complex(2, 0, 2);
-		$r = $a->div($b);
-		$t = new Complex(4, 0, 0);
-		$this->assertTrue(Complex::is_equal($t,$r,$err,TRUE), '');
-
-		$a = new Complex(2, 0, 2);
-		$b = new Complex(0, 0, 2);
-		$r = @Complex::c_div($a,$b);
-		$this->assertEquals(FALSE, $r);
-
+		$this->setExpectedException(
+			#'InvalidArgumentException', 'Right Message'
+			'InvalidArgumentException'
+		);
 		$a = Complex::c_polar(2, 0, 2);
 		$b = Complex::c_polar(0, 0, 2);
-		$r = @Complex::c_div($a,$b);
-		$this->assertEquals(FALSE, $r);
-
-		$a = new Complex(0, 0, 2);
-		$b = new Complex(0, 0, 2);
-		$r = @Complex::c_div($a,$b);
-		$this->assertEquals(FALSE, $r);
+		$r = Complex::c_div($a,$b);
+		#echo var_dump($r);
 	}
 
 /* c_atoc, flat */
 
 	public function testAtoc ()
 	{
+		$a = array(3,4);
+		$t = new Complex(3, 4, 0);
+		$this->assertEquals($t, Complex::atoc($a));
+
 		$a = array(3,4,2);
 		$t = new Complex(3, 4, 2);
 		$this->assertEquals($t, Complex::atoc($a));
 
-		$a = array(3,4);
-		$t = new Complex(3, 4, 0);
-		$this->assertEquals($t, Complex::atoc($a));
+		$a = array(3,4,2);
+		$t = new Complex(3, 4, 5);
+		$this->assertEquals($t, Complex::atoc($a, 5));
+
 	}
 
 
@@ -244,96 +373,104 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(0, $r->theta());
 	}
 
-	public function testLog()
+	public function testLog_Error()
 	{
+		$this->setExpectedException(
+			#'InvalidArgumentException', 'Right Message'
+			'InvalidArgumentException'
+		);
 		$a = new Complex(0, 0);
 		$r = $a->log();
-		$this->assertEquals(-INF, $r->Re());
-		$this->assertEquals(0, $r->Im());
+	}
+	
+	public function testLog()
+	{
+		$a = new Complex(1e-323, 0);
+		$r = $a->log();
+		$this->assertEquals(abs(log(1e-323)), $r->abs());
+		$this->assertEquals(pi(), $r->theta());
+
+		$a = new Complex(3, 4, 3);
+		$r = $a->log();
+		$this->assertEquals(sqrt(log(5)*log(5)+$a->theta()*$a->theta()), $r->abs());
 		$this->assertEquals(0, $r->branch());
 
-		$a = new Complex(0, 0, 2);
-		$r = $a->log();
-		$this->assertEquals(-INF, $r->Re());
-		$this->assertEquals(0, $r->Im());
-		$this->assertEquals(2, $r->branch());
 	}
 
 /* pow, apow */
 
-	public function testPow ()
+	public function testPowPolar ()
 	{
 		$err = 1e-12;
 
+		$a = Complex::c_upolar(0, 2);
+		
+		$z = Complex::c_upolar(0, 0);
+		$r = $a->pow($z);
+		$t = new Complex(1, 0);
+		$this->assertTrue(Complex::is_equal($t, $r,$err, TRUE));
+	}
+
+	public function testPow ()
+	{
+		$err = 1e-12;
+		
 		$a = new Complex(0, 0, 2);
 
+		$z = new Complex(0, 0);
+		$r = $a->pow($z);
+		$t = new Complex(1, 0, 0);
+		$this->assertEquals($t, $r);
+
 		$z = new Complex(.5, -1);
-		$t = new Complex(1, 0, 0);
-		$this->assertEquals($t, $a->pow($z));
+		$r = $a->pow($z);
+		$t = new Complex(0, 0, 0);
+		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
 
-		$z = new Complex(0, 0);
-		$t = new Complex(1, 0, 0);
-		$this->assertEquals($t, $a->pow($z));
-
-		$z = new Complex(0, 0);
-		$t = new Complex(1, 0, 4);
-		$this->assertEquals($t, $a->pow($z, 4));
 
 		$a = new Complex(3, 4, 2);
 		
+		$z = new Complex(0, 0);
+		$r = $a->pow($z);
+		$t = new Complex(1, 0, 0);
+		$this->assertTrue(Complex::is_equal($t,$r,$err,TRUE), '');
+
+		$z = new Complex(0, .2);
+		$r = $a->pow($z);
+		$t = new Complex(0.063834651394626, 0.021287936620404, 0);
+		$this->assertTrue(Complex::is_equal($t,$r,1e-5,TRUE), '');
+
 		$z = new Complex(.5, 0);
 		$r = $a->pow($z);
-		$this->assertEquals(2, $r->Re());
-		$this->assertEquals(1, $r->Im());
-		$this->assertEquals(1, $r->branch());
+		$t = new Complex(2, 1, 1);
+		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
 
 		$z = new Complex(.5, .2);
 		$r = $a->pow($z);
-		$this->assertEquals(0.10638136616885, $r->Re());
-		$this->assertEquals(0.10641052463543, $r->Im());
-		$this->assertEquals(1, $r->branch());
-
-		$z = new Complex(0, .2);
-		$t = new Complex(0.063834651394626, 0.021287936620404, 0);
-		$r = $a->pow($z);
-		$this->assertEquals(0.063834651394626, $r->Re());
-		$this->assertEquals(0.021287936620404, $r->Im());
-		$this->assertEquals(0, $r->branch());
-
-		$z = new Complex(0, 0);
-		$t = new Complex(1, 0, 0);
-		$this->assertEquals($t, $a->pow($z));
-
-		$z = new Complex(.5, 0);
-		$r = Complex::c_pow($a, $z, 0);
-		$t = new Complex(2, 1, 0);
+		$t = new Complex(0.10638136616885, 0.10641052463543, 1);
 		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
 
 		$z = new Complex(0, 2);
-		$r = Complex::c_pow($a, $z, 0);
+		$r = $a->pow($z);
 		$t = new Complex(-1.8978091263029E-12, -1.4696140923872E-13, 1);
 		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
 
+		
 		$z = new Complex(-1/3, 1);
-		$r = Complex::c_pow($a, $z, 0);
-		$t = new Complex(0.061813199275868, 0.2229511175794, 0);
-		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
-
-		$z = new Complex(1/3, 1);
-		$r = Complex::c_pow($a, $z, 1);
-		$t = new Complex(-1.5013400221071E-9, 4.1419766403179E-9, 1);
-		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
-
-		$z = new Complex(-1/3, 1);
-		$r = Complex::c_pow($a, $z);
+		$r = $a->pow($z);
 		$t = new Complex(-7.8112259997596E-7, -2.0206972129886E-7, 0);
 		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
 
 		$z = new Complex(1/3, 1);
-		$r = Complex::c_pow($a, $z);
+		$r = $a->pow($z);
 		$t = new Complex(2.3228166142922E-6, -4.1275146391821E-7, 1);
-		#echo $r, $r->Re(), $r->Im();
 		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE));
+		
+		$a = Complex::c_upolar(exp(pi()), -3);
+		$z = new Complex(-1/3, 1);
+		$r = $a->pow($z);
+		$this->assertEquals(pi(),$r->arg());
+		$this->assertEquals(1,$r->branch());
 	}
 
 	public function testApow ()
@@ -341,6 +478,18 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$err = 1e-12;
 
 		$a = new Complex(3, 4, 2);
+
+		$z = new Complex(0, 2);
+		$res = $a->apow($z, 1);
+		#print_r($res[0]);
+		$t = array(
+			0 => Complex::c_upolar(1.9034907763591E-12, 0.51229999872678)
+		);
+		$this->assertTrue(Complex::is_equal($t[0], $res[0],$err,TRUE));
+
+		$z = new Complex(0, 2);
+		$res = $a->apow($z, 2);
+		$this->assertEquals(array(),$res);
 
 		$z = new Complex(-1/3, 1);
 		$res = Complex::c_apow($a, $z, 0);

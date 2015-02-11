@@ -16,7 +16,7 @@ class Complex implements iComplex
 	/**
 	 * int Mode.
 	 */
-	protected $mode = self::PHPCOMPLEX_MODE_COORDS;
+	protected $mode;
 
 	/**
 	 * float Real part.
@@ -58,11 +58,11 @@ class Complex implements iComplex
 	public function __construct($x = NULL, $y = NULL, $s = NULL, $mode = NULL)
 	{
 		if ( is_null($mode) ) {
-			$mode = self::PHPCOMPLEX_MODE_COORDS;
+			$mode = self::COORDS;
 		}
 
-		if ( ($mode === self::PHPCOMPLEX_MODE_COORDS) ) {
-			$this->set_mode(self::PHPCOMPLEX_MODE_COORDS, FALSE);
+		if ( ($mode === self::COORDS) ) {
+			$this->set_mode(self::COORDS, FALSE);
 			if ( is_null($x) ) {
 				$x = 0;
 			}
@@ -73,8 +73,8 @@ class Complex implements iComplex
 				$s = 0;
 			}
 			$this->set_coords($x, $y, $s);
-		} elseif  ( ($mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-			$this->set_mode(self::PHPCOMPLEX_MODE_POLAR, FALSE);
+		} elseif  ( ($mode === self::POLAR) ) {
+			$this->set_mode(self::POLAR, FALSE);
 			if ( is_null($x) ) {
 				$x = 0;
 			}
@@ -100,32 +100,32 @@ class Complex implements iComplex
 	 */
 	static public function c_coords($x = NULL, $y = NULL, $s = NULL)
 	{
-		return new static($x, $y, $s, self::PHPCOMPLEX_MODE_COORDS);
+		return new static($x, $y, $s, self::COORDS);
 	}
 
 	/**
 	 * Creates a polar complex from radius and angle.
 	 * Note: Arg will be set to ]-pi(),pi()], and branch will be set.
 	 * 
-	 * @param float Radius. Default: 0.
+	 * @param float (Optional) Radius. Default: 0.
 	 * @param float (Optional) Angle. Default: 0.
 	 * @param bool  (Optional) unitary flag. Default: FALSE.
 	 * @return object Complex
 	 */
 	static public function c_polar($r = NULL, $theta = NULL, $umode = NULL)
 	{
-		return new static($r, $theta, $umode, self::PHPCOMPLEX_MODE_POLAR);
+		return new static($r, $theta, $umode, self::POLAR);
 	}
 
 	/**
 	 * Creates a polar complex from radius and unitary angle.
-	 * Note: uArg will be set to ]-0.5,0.5], and branch will be set.
+	 * An unitary angle is the angle in radians divided by (2*pi()).
 	 * 
-	 * @param float Radius.
-	 * @param float (Optional) Angle as unitary.
+	 * @param float (Optional) Radius. Default: 0.
+	 * @param float (Optional) Angle as unitary. Default: 0.
 	 * @return object Complex
 	 */
-	static public function c_upolar($r, $utheta = NULL)
+	static public function c_upolar($r = NULL, $utheta = NULL)
 	{
 		return static::c_polar($r, $utheta, TRUE);
 	}
@@ -156,10 +156,10 @@ class Complex implements iComplex
 	 */
 	public function set_coords($x = NULL, $y = NULL, $s = NULL)
 	{
-		$this->set_mode(self::PHPCOMPLEX_MODE_COORDS);
+		$this->set_mode(self::COORDS);
 
 		if ( !is_null($x) ) {
-			if ( !is_numeric($x) ) {
+			if ( !is_numeric($x) || !is_finite($x) ) {
 				throw new \InvalidArgumentException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument')
 				);
@@ -167,7 +167,7 @@ class Complex implements iComplex
 			$this->set_Re($x);
 		}
 		if ( !is_null($y) ) {
-			if ( !is_numeric($y) ) {
+			if ( !is_numeric($y) || !is_finite($y) ) {
 				throw new \InvalidArgumentException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument')
 				);
@@ -188,21 +188,24 @@ class Complex implements iComplex
 	/**
 	 * Updates complex with polar coordinates.
 	 * 
+	 * @param float (Optional) Radius.
+	 * @param float (Optional) Angle.
+	 * @param bool  (Optional) unitary flag. Default: FALSE.
 	 * @return object Complex A
 	 */
 	public function set_polar($r = NULL, $theta = NULL, $umode = NULL)
 	{
-		$this->set_mode(self::PHPCOMPLEX_MODE_POLAR);
+		$this->set_mode(self::POLAR);
 
 		if ( !is_null($r) ) {
-			if ( !is_numeric($r) ) {
+			if ( !is_numeric($r) || !is_finite($r) ) {
 				throw new \InvalidArgumentException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument')
 				);
 			}
 			$this->set_abs($r);
 		}
-		if ( !is_null($theta) ) {
+		if ( !is_null($theta) || !is_finite($theta) ) {
 			if ( !is_numeric($theta) ) {
 				throw new \InvalidArgumentException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument')
@@ -232,17 +235,16 @@ class Complex implements iComplex
 			);
 		}
 		
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$c = new static(
 				$this->Re(),
 				-$this->Im()
 			);
 			if ( is_null($s) ) {
-				$c->set_branch($this->branch());
-				$s = $c->uminus_branch();
+				$s = $this->uminus_branch();
 			}
 			$c->set_branch($s);
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				$this->abs(), 
 				-$this->utheta()
@@ -264,37 +266,19 @@ class Complex implements iComplex
 	 */
 	public function inv($s = NULL)
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
-
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		$c = $this->conj($s);
+		if ( ($this->mode() === self::COORDS) ) {
 			if ( ($this->Re() == 0) && ($this->Im() == 0) ) {
 				return 1/0;
 			}
-			$r2 = $this->Re()*$this->Re() + $this->Im()*$this->Im();
-			$c = new static(
-				$this->Re()/$r2,
-				-$this->Im()/$r2
-			);
-			if ( is_null($s) ) {
-				$c->set_branch($this->branch());
-				$s = $c->uminus_branch();
-			}
-			$c->set_branch($s);
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+			$r2 = $this->abs2();
+			$c->set_Re($c->Re()/$r2);
+			$c->set_Im($c->Im()/$r2);
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			if ( ($this->abs() == 0) ) {
 				return 1/0;
 			}
-			$c = static::c_upolar(
-				1/$this->abs(), 
-				-$this->utheta()
-			);
-			if ( !is_null($s) ) {
-				$c->set_branch($s);
-			}
+			$c->set_abs(1/$this->abs()); 
 		} else {
 			return NULL;
 		}
@@ -318,11 +302,21 @@ class Complex implements iComplex
 		if ( is_null($s) ) {
 			$s = $this->branch();
 		}
-		$c = new static(
-			-$this->Re(),
-			-$this->Im(),
-			$s
-		);
+		if ( ($this->mode() === self::COORDS) ) {
+			$c = new static(
+				-$this->Re(),
+				-$this->Im(),
+				$s
+			);
+		} elseif  ( ($this->mode() === self::POLAR) ) {
+			$c = static::c_upolar(
+				$this->abs(), 
+				$this->utheta()+0.5
+			);
+			$c->set_branch($s);
+		} else {
+			return NULL;
+		}
 		return $c;
 	}
 
@@ -340,7 +334,7 @@ class Complex implements iComplex
 			);
 		}
 		
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$r = $this->abs();
 			$rc = sqrt( ($r + $this->Re())/2 );
 			$ic = sqrt( ($r - $this->Re())/2 );
@@ -354,11 +348,11 @@ class Complex implements iComplex
 			}
 			
 			if ( is_null($s) ) {
-				$s = $this->branch($theta);
+				$s = static::branch_of($theta);
 			}
 			$c = new static($rc, $ic, $s);
 
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				sqrt($this->abs()), 
 				$this->utheta()/2
@@ -408,13 +402,21 @@ class Complex implements iComplex
 		}
 
 		if ( is_null($s) ) {
-			$s = $this->branch();
+			$s = 0;
 		}
-		$c = new static(
-			log($this->abs()), 
-			$this->theta(),
-			$s
-		);
+		try {
+			$c = new static(
+				0.5*log($this->abs2()), 
+				$this->theta(),
+				$s
+			);
+		} catch (\Exception $e) {
+			$c = new static(
+				log($this->abs()), 
+				$this->theta(),
+				$s
+			);
+		}
 		return $c;
 	}
 
@@ -456,7 +458,7 @@ class Complex implements iComplex
 		}
 
 		if ( is_null($s) ) {
-			$s = static::ubranch( $a->utheta() );
+			$s = $a->branch();
 		}
 		$c = new static(
 			$a->Re()+$b->Re(),
@@ -489,7 +491,7 @@ class Complex implements iComplex
 		}
 
 		if ( is_null($s) ) {
-			$s = static::ubranch( $a->utheta() );
+			$s = $a->branch();
 		}
 		$c = new static(
 			$a->Re()-$b->Re(),
@@ -521,18 +523,18 @@ class Complex implements iComplex
 			$b = new static($b, NULL, $s);
 		}
 
-		if ( ($a->mode === self::PHPCOMPLEX_MODE_COORDS) 
-				&& ($a->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		if ( ($a->mode() === self::COORDS) 
+				&& ($a->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				$a->abs()*$b->abs(),
-				$a->utheta()+$b->utheta()
+				$a->utheta() + $b->utheta()
 			);
 			if ( !is_null($s) ) {
 				$c->set_branch($s);
 			}
 		} else {
 			if ( is_null($s) ) {
-				$s = static::ubranch( $a->utheta() + $b->utheta() );
+				$s = static::branch_ofu( $a->utheta() + $b->utheta() );
 			}
 			$c = new static(
 				$a->Re()*$b->Re()-$a->Im()*$b->Im(),
@@ -565,25 +567,31 @@ class Complex implements iComplex
 			$b = new static($b, NULL, $s);
 		}
 
-		if ( ($a->mode === self::PHPCOMPLEX_MODE_COORDS) 
-				&& ($a->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		if ( ($a->mode() === self::COORDS) 
+				&& ($a->mode() === self::POLAR) ) {
 			if ( ($b->abs() == 0) ) {
-				return 1/0;
+				throw new \InvalidArgumentException(
+					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
+				);
+				#return 1/0;
 			}
 			$c = static::c_upolar(
 				$a->abs()/$b->abs(),
-				$a->utheta()-$b->utheta()
+				$a->utheta() - $b->utheta()
 			);
 			if ( !is_null($s) ) {
 				$c->set_branch($s);
 			}
 		} else {
-			$r2b = $b->Re()*$b->Re() + $b->Im()*$b->Im();
+			$r2b = $b->abs2();
 			if ( ($r2b == 0) ) {
-				return 1/0;
+				throw new \InvalidArgumentException(
+					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
+				);
+				#return 1/0;
 			}
 			if ( is_null($s) ) {
-				$s = static::ubranch( $a->utheta() - $b->utheta() );
+				$s = static::branch_ofu( $a->utheta() - $b->utheta() );
 			}
 			$c = new static(
 				($a->Re()*$b->Re()+$a->Im()*$b->Im())/$r2b,
@@ -599,17 +607,11 @@ class Complex implements iComplex
 	 * 
 	 * @param object Complex A.
 	 * @param object Complex z.
-	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A ** z.
 	 */
-	static public function c_pow($a, $z, $s = NULL)
+	static public function c_pow($a, $z)
 	{
-		/*
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
+		
 		if ( !static::is_complex($a) ) {
 			$a = new static($a, NULL, 0);
 		}
@@ -617,81 +619,16 @@ class Complex implements iComplex
 			$z = new static($z, NULL, 0);
 		}
 		
-		if ( ($a->Re() == 0) && ($a->Im() == 0) ) {
-			// 0 ** z = 1
-			return new static(1, 0, $s);
-		}
-		
-		#echo 'c_apow Re(z)k ',$z->Re(),"\n";
 		if ( ($z->Re() == 0) && ($z->Im() == 0) ) {
-			// w ** 0 = 1
-			return new static(1, 0, $s);
+			// w ** 0 = 1, 0 ** 0 = 1
+			return new static(1, 0, 0);
 		}
-
-		if ( ( $z->Re() == 0 ) ) {
-			// Only one result
-			#return $z->mult($a->log())->exp();
-			$r_v = exp(-$z->Im() * $a->theta());
-			$theta_v = $z->Im() * log($a->abs());
-			return static::c_polar($r_v, $theta_v);
+		if ( ($a->Re() == 0) && ($a->Im() == 0) ) {
+			// 0 ** z = 0
+			return new static(0, 0, 0);
 		}
 		
-		$k = 0;
-		if ( !is_null($s) ) {
-			$tv = ( $z->Im() * log($a->abs())
-					+ $z->Re() * $a->theta() )
-					/(2*pi()); 
-			if ( ( $z->Re() > 0 ) ) {
-				$k = (int) floor( (-$tv + $s - 1/2)/$z->Re() ) + 1;
-			} else {
-				$k = (int) floor( (-$tv + $s - 1/2)/$z->Re() );
-			}
-		}
-
-		$r_v = pow($a->abs(), $z->Re()) 
-				* exp(-$z->Im() * ( $a->theta() + 2*pi()*$k ));
-		$theta_v = $z->Im() * log($a->abs())
-				 + $z->Re() * ( $a->theta() + 2*pi()*$k );
-		#return static::c_polar($r_v, $theta_v);
-
-		if ( !is_null($s) ) {
-			$w = clone($a);
-			$w->set_branch($w->branch()+$k);
-			return $z->mult($w->log())->exp();
-		} 
 		return $z->mult($a->log())->exp();
-		*/
-
-		$av = static::c_apow($a, $z, $s);
-		reset($av);
-		
-		if ( is_null($s) ) {
-			#return current($av);
-			return $av[0];
-		}
-		
-		while ( (list($k, $v) = each($av)) ) {
-			$key = $k;
-			if ( ($v->arg() >=  0) ) {
-				break;
-			}
-		}
-		
-		return $av[$key];
-		
-		/*
-		// if $av was not ordered
-		reset($av);
-		list($key, $v) = each($av);
-		$p = $v->arg();
-		while ( (list($k, $v) = each($av)) ) {
-			if ( ( ($p < 0) || ($v->arg() >= 0) ) 
-			 		&& (abs($v->arg()) < abs($p)) ) {
-				$key = $k;
-				$p = $v->arg();
-			}
-		}
-		*/
 	}
 
 	/**
@@ -707,6 +644,12 @@ class Complex implements iComplex
 	{
 		$max_roots = 20;
 		
+		#$r_v = pow($a->abs(), $z->Re()) 
+		#		* exp(-$z->Im() * ( $a->theta() + 2*pi()*$k ));
+		#$theta_v = $z->Im() * log($a->abs()) 
+		#		+ $z->Re() * ( $a->theta() + 2*pi()*$k );
+		#$v = c_polar($r_v, $theta_v);
+		
 		if ( !is_null($s) && !is_int($s) ) {
 			throw new \InvalidArgumentException(
 				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
@@ -721,80 +664,72 @@ class Complex implements iComplex
 		
 		$a = clone($w);
 		$sa = $a->branch();
-		#echo 'c_apow a ',$a,"\n";
 		
-		#$r_v = pow($a->abs(), $z->Re()) 
-		#		* exp(-$z->Im() * ( $a->theta() + 2*pi()*$k ));
-		#$theta_v = $z->Im() * log($a->abs()) + $z->Re() 
-		#		* ( $a->theta() + 2*pi()*$k );
-		#$v = c_polar($r_v, $theta_v);
-		
-		if ( ($a->Re() == 0) && ($a->Im() == 0) ) {
-			// 0 ** z = 1
-			$av = array( 
-				0 => new static(1, 0, $s)
-			);
+		$av = array();
+		if ( ($z->Re() == 0) && ($z->Im() == 0) ) {
+			// w ** 0 = 1, 0 ** 0 = 1
+			$av[] = new static(1, 0, 0);
 			return $av;
 		}
-		
-		#echo 'c_apow Re(z)k ',$z->Re(),"\n";
-		if ( ( $z->Re() == 0 ) ) {
-			if ( ( $z->Im() == 0 ) ) {
-				// w ** 0 = 1
-				$av = array( 
-					0 => new static(1, 0, $s)
-				);
-				return $av;
-			}
-			
-			// Only one result
-			$r_v = exp(-$z->Im() * $a->theta());
-			$theta_v = $z->Im() * log($a->abs());
-			$av = array( 
-				0 => static::c_polar($r_v, $theta_v)
-			);
+		if ( ($a->Re() == 0) && ($a->Im() == 0) ) {
+			// 0 ** z = 0
+			$av[] = new static(0, 0, 0);
 			return $av;
 		}
 		
 		if ( is_null($s) ) {
-			// return only the k=0 value
-			$av = array( 
-				0 => $z->mult($a->log())->exp(),
-			);
+			$s = static::branch_of(
+				$z->Re()*$a->theta() + $z->Im()*log($a->abs())
+			); 
+		}
+		
+		if ( ( $z->Re() == 0 ) ) {
+			#if ( ( $z->Im() == 0 ) ) {
+			#	// w ** 0 = 1
+			#	$av = array( 
+			#		0 => new static(1, 0, $s)
+			#	);
+			#	return $av;
+			#}
+			
+			// Only one result
+			$r_v = exp(-$z->Im() * $a->theta());
+			$theta_v = $z->Im() * log($a->abs());
+			if ( (static::branch_of($theta_v) == $s) ) {
+				$av[] = static::c_polar($r_v, $theta_v);
+			}
 			return $av;
 		}
 		
-		#echo 'c_apow 1/abs(c) ',1/abs($z->Re()),"\n";
-		#echo 'c_apow s ',$s,"\n";
-		
-		$tv = ( $z->Im() * log($a->abs())
-				+ $z->Re() * $a->theta() )/(2*pi()); 
+		$ks = -$a->utheta()
+			+(-$z->Im()*log($a->abs())*0.5/pi()+$s)/$z->Re()
+		; 
 		if ( ( $z->Re() > 0 ) ) {
-			$k = (int) floor( (-$tv + $s - 1/2)/$z->Re() ) + 1;
-		} else {
-			$k = (int) floor( (-$tv + $s - 1/2)/$z->Re() );
-		}
-		
-		if ( ( $z->Re() > 0 ) ) {
-			$f = (int) floor( (-$tv + $s + 1/2)/$z->Re() );
+			// k > x
+			$k = (int) floor( $ks - 0.5/$z->Re() ) + 1;
+			// f <= x
+			$f = (int) floor( $ks + 0.5/$z->Re() );
 			if ( ($f-$k > $max_roots) ) {
 				trigger_error('too many roots... retriving first ' . $max_roots . '.', E_USER_WARNING);
 				$f = $k+$max_roots;
 			}
 			do {
 				$a->set_branch($sa+$k);
-				$av[$k] = static::c_mult($z, $a->log())->exp();
+				$av[$k] = $z->mult($a->log())->exp();
 				$k++;
 			} while ( ($k <= $f) );
 		} else {
-			$f = (int) ceil( (-$tv + $s + 1/2)/$z->Re() );
+			// k < x
+			$k = (int) ceil( $ks - 0.5/$z->Re() ) - 1;
+			// f >= x
+			$f = (int) ceil( $ks + 0.5/$z->Re() );
 			if ( ($k-$f > $max_roots) ) {
-				trigger_error('too many roots... retriving first 50.', E_USER_WARNING);
+				trigger_error('too many roots... retriving first ' . $max_roots . '.', E_USER_WARNING);
 				$f = $k-$max_roots;
 			}
 			do {
 				$a->set_branch($sa+$k);
-				$av[$k] = static::c_mult($z, $a->log())->exp();
+				$av[$k] = $z->mult($a->log())->exp();
 				$k--;
 			} while ( ($k >= $f) );
 		}
@@ -855,12 +790,11 @@ class Complex implements iComplex
 	 * Power.
 	 * 
 	 * @param object Complex z.
-	 * @param int (Optional) Branch s for the result.
 	 * @return object Complex A**z.
 	 */
-	public function pow($z, $s = NULL)
+	public function pow($z)
 	{
-		return static::c_pow($this, $z, $s);
+		return static::c_pow($this, $z);
 	}
 
 	/**
@@ -891,33 +825,6 @@ class Complex implements iComplex
 
 
 	/**
-	 * __toString()
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-	{
-		#$format='%13.5g';
-		$format='%.5g';
-		$str = sprintf($format, $this->Re()); 
-		if ( ($this->Re() >= 0) ) {
-			$str = ' ' . $str;
-		}
-		$format='%.5g';
-		if ( ($this->Im() > 0) ) {
-			$str .= ' + ' . sprintf($format, $this->Im()) . 'i'; 
-		} elseif ( ($this->Im() < 0) ) {
-			$str .= ' - ' . sprintf($format, abs($this->Im())) . 'i'; 
-		}
-		$str .= ' (' . rad2deg($this->arg()) . 'º';
-		$str .= (($this->branch() == 0)? ')' 
-				: '(' . $this->branch() . '))');
-		#return str_pad($str,26); 
-		return $str; 
-	}
-
-
-	/**
 	 * Get store mode.
 	 *
 	 * @return int Current mode.
@@ -943,24 +850,24 @@ class Complex implements iComplex
 		}
 
 		if ( ($update === FALSE) ) {
-			if ( ($mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-				$this->mode = self::PHPCOMPLEX_MODE_POLAR;
-			} elseif  ( ($mode === self::PHPCOMPLEX_MODE_COORDS) ) {
-				$this->mode = self::PHPCOMPLEX_MODE_COORDS;
+			if ( ($mode === self::POLAR) ) {
+				$this->mode = self::POLAR;
+			} elseif  ( ($mode === self::COORDS) ) {
+				$this->mode = self::COORDS;
 			}
 			
-		} elseif ( ($mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		} elseif ( ($mode === self::POLAR) ) {
 			$abs = $this->abs();
 			$theta = $this->utheta();
-			$this->mode = self::PHPCOMPLEX_MODE_POLAR;
+			$this->mode = self::POLAR;
 			$this->set_abs($abs);
 			$this->set_utheta($theta);
 			
-		} elseif  ( ($mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		} elseif  ( ($mode === self::COORDS) ) {
 			$re = $this->Re();
 			$im = $this->Im();
 			$s = $this->branch();
-			$this->mode = self::PHPCOMPLEX_MODE_COORDS;
+			$this->mode = self::COORDS;
 			$this->set_Re($re);
 			$this->set_Im($im);
 			$this->set_branch($s);
@@ -976,20 +883,19 @@ class Complex implements iComplex
 	public function Re()
 	{
 		$precision = 1e-14;
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$x = $this->re;
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$cos = cos($this->theta());
 			if ( (abs($cos) < $precision) ) {
 				$cos = 0;
 			}
-			#if ( (abs($cos - 1) < $precision) ) {
-			#	$cos = 1;
-			#}
-			#if ( (abs($cos + 1) < $precision) ) {
-			#	$cos = -1;
-			#}
 			$x = $this->abs()*$cos;
+			#if ( is_nan($x) ) {
+			#	if ( ($cos == 0) ) {
+			#		$x = 0;
+			#	}
+			#}
 		} else {
 			return NULL;
 		}
@@ -1008,11 +914,11 @@ class Complex implements iComplex
 			return FALSE;
 		}
 
-		if  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-			$this->set_mode(self::PHPCOMPLEX_MODE_COORDS);
+		if  ( ($this->mode() === self::POLAR) ) {
+			$this->set_mode(self::COORDS);
 		}
 		
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$this->re = $x;
 		}
 	}
@@ -1026,20 +932,19 @@ class Complex implements iComplex
 	public function Im()
 	{
 		$precision = 1e-14;
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$y = $this->im;
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$sin = sin($this->theta());
 			if ( (abs($sin) < $precision) ) {
 				$sin = 0;
 			}
-			#if ( (abs($sin - 1) < $precision) ) {
-			#	$sin = 1;
-			#}
-			#if ( (abs($sin + 1) < $precision) ) {
-			#	$sin = -1;
-			#}
 			$y = $this->abs()*$sin;
+			#if ( is_nan($y) ) {
+			#	if ( ($sin == 0) ) {
+			#		$y = 0;
+			#	}
+			#}
 		} else {
 			return NULL;
 		}
@@ -1058,13 +963,63 @@ class Complex implements iComplex
 			return FALSE;
 		}
 
-		if  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-			$this->set_mode(self::PHPCOMPLEX_MODE_COORDS);
+		if  ( ($this->mode() === self::POLAR) ) {
+			$this->set_mode(self::COORDS);
 		}
 		
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$this->im = $x;
 		}
+	}
+
+	/**
+	 * Get Absolute/Radius.
+	 * 
+	 * @return float |A|.
+	 */
+	public function abs()
+	{
+		if ( ($this->mode() === self::COORDS) ) {
+			if ( ($this->Re() == 0) ) {
+				$r = abs($this->Im());
+			} elseif ( ($this->Im() == 0) ) {
+				$r = abs($this->Re());
+			} else {
+				$r = sqrt(
+					$this->Re()*$this->Re() 
+					+ $this->Im()*$this->Im()
+				);
+			}
+		} elseif  ( ($this->mode() === self::POLAR) ) {
+			$r = $this->r;
+		} else {
+			return NULL;
+		}
+		return $r;
+	}
+
+	/**
+	 * Get Square of Absolute/Radius.
+	 * 
+	 * @return float |A|**2.
+	 */
+	public function abs2()
+	{
+		if ( ($this->mode() === self::COORDS) ) {
+			if ( ($this->Re() == 0) ) {
+				$r = $this->Im()*$this->Im();
+			} elseif ( ($this->Im() == 0) ) {
+				$r = $this->Re()*$this->Re();
+			} else {
+				$r = $this->Re()*$this->Re() 
+						+ $this->Im()*$this->Im();
+			}
+		} elseif  ( ($this->mode() === self::POLAR) ) {
+			$r = $this->r*$this->r;
+		} else {
+			return NULL;
+		}
+		return $r;
 	}
 
 	/**
@@ -1079,12 +1034,12 @@ class Complex implements iComplex
 			return FALSE;
 		}
 		
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
-			$this->set_mode(self::PHPCOMPLEX_MODE_POLAR);
+		if ( ($this->mode() === self::COORDS) ) {
+			$this->set_mode(self::POLAR);
 		}
 		
-		if  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-			$this->abs = $x;
+		if  ( ($this->mode() === self::POLAR) ) {
+			$this->r = $x;
 		}
 	}
 
@@ -1095,7 +1050,17 @@ class Complex implements iComplex
 	 */
 	public function arg()
 	{
-		return 2*pi()*$this->uarg();
+		if ( ($this->mode() === self::COORDS) ) {
+			if ( ($this->Re() == 0) && ($this->Im() == 0) ) {
+				return 0;
+			}
+			$arg = atan2($this->Im(), $this->Re());
+		} elseif  ( ($this->mode() === self::POLAR) ) {
+			$arg = 2*pi()*$this->uarg();
+		} else {
+			return FALSE;
+		}
+		return $arg;
 	}
 	/**
 	 * Get unitary Arg.
@@ -1104,42 +1069,23 @@ class Complex implements iComplex
 	 */
 	public function uarg()
 	{
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
-			if ( ($this->Re() == 0) && ($this->Im() == 0) ) {
-				return 0;
-			}
-			$uarg = atan2($this->Im(), $this->Re())*0.5/pi();
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		if ( ($this->mode() === self::COORDS) ) {
+			$uarg = $this->arg()*0.5/pi();
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			if ( ($this->abs() == 0) ) {
 				return 0;
 			}
 			$uarg = $this->utheta() - $this->branch();
+			
+			if ( ($uarg <= -0.5) || ($uarg > 0.5) ) {
+				throw new \LogicException(
+					dgettext(PHPCOMPLEX_DOMAIN, 'trying to set invalid arg value')
+				);
+			}
 		} else {
 			return FALSE;
 		}
-		if ( ($uarg <= -0.5) || ($uarg > 0.5) ) {
-			throw new \LogicException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'trying to set invalid arg value')
-			);
-		}
 		return $uarg;
-	}
-
-	/**
-	 * Get Absolute/Radius.
-	 * 
-	 * @return float |A|.
-	 */
-	public function abs()
-	{
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
-			$r = sqrt($this->Re()*$this->Re() + $this->Im()*$this->Im());
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-			$r = $this->abs;
-		} else {
-			return NULL;
-		}
-		return $r;
 	}
 
 	/**
@@ -1158,12 +1104,12 @@ class Complex implements iComplex
 	 */
 	public function utheta()
 	{
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			if ( ($this->Re() == 0) && ($this->Im() == 0) ) {
 				return 0;
 			}
 			$utheta = $this->uarg() + $this->branch();
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			if ( ($this->abs() == 0) ) {
 				return 0;
 			}
@@ -1195,33 +1141,13 @@ class Complex implements iComplex
 		if ( !is_numeric($utheta) ) {
 			return FALSE;
 		}
-		if ( ($this->mode() === self::PHPCOMPLEX_MODE_COORDS) ) {
-			$this->set_mode(self::PHPCOMPLEX_MODE_POLAR);
+		if ( ($this->mode() === self::COORDS) ) {
+			$this->set_mode(self::POLAR);
 		}
 		
-		if  ( ($this->mode() === self::PHPCOMPLEX_MODE_POLAR) ) {
+		if  ( ($this->mode() === self::POLAR) ) {
 			$this->theta = $utheta;
 		}
-	}
-
-	/**
-	 * Get branch from unitary angle.
-	 * 
-	 * @param float Unitary angle.
-	 * @return int Branch of angle.
-	 */
-	protected function ubranch($utheta)
-	{
-		if ( !is_numeric($utheta) ) {
-			return FALSE;
-		}
-
-		if ( ($utheta > -0.5) && ($utheta <= 0.5) ) {
-			$s = 0;
-		} else {
-			$s = (int) ceil( ($utheta - 0.5) );
-		}
-		return $s;
 	}
 
 	/**
@@ -1230,19 +1156,14 @@ class Complex implements iComplex
 	 * @param float (Optional) Angle to get branch from.
 	 * @return int Current branch or branch of angle.
 	 */
-	public function branch($theta = NULL)
+	public function branch()
 	{
-		if ( !is_null($theta) ) {
-			return $this->ubranch($theta*0.5/pi());
+		if ( ($this->mode() === self::COORDS) ) {
+			$s = $this->s;
+		} elseif  ( ($this->mode() === self::POLAR) ) {
+			$s = $this->branch_ofu($this->utheta());
 		} else {
-			if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
-				$s = $this->s;
-			} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-				#$s = $this->branch($this->theta());
-				$s = $this->ubranch($this->utheta());
-			} else {
-				return NULL;
-			}
+			return NULL;
 		}
 		return $s;
 	}
@@ -1258,10 +1179,9 @@ class Complex implements iComplex
 		if ( !is_int($s) ) {
 			return FALSE;
 		}
-		if ( ($this->mode === self::PHPCOMPLEX_MODE_COORDS) ) {
+		if ( ($this->mode() === self::COORDS) ) {
 			$this->s = $s;
-		} elseif  ( ($this->mode === self::PHPCOMPLEX_MODE_POLAR) ) {
-			#$this->set_theta($this->arg() + 2*pi()*$s);
+		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$this->set_utheta( 
 				$this->utheta() - $this->branch() + $s
 			);
@@ -1278,6 +1198,38 @@ class Complex implements iComplex
 		$s = -$this->branch();
 		if ( ($this->Im() == 0) && ($this->Re() < 0) ) {
 			$s--;
+		}
+		return $s;
+	}
+
+	/**
+	 * Get branch of an angle.
+	 * 
+	 * @param float Angle to get branch from.
+	 * @return int branch of angle.
+	 */
+	static public function branch_of($theta)
+	{
+		return static::branch_ofu($theta*0.5/pi());
+	}
+
+	/**
+	 * Get branch from unitary angle.
+	 * 
+	 * @param float Unitary angle.
+	 * @return int Branch of angle.
+	 */
+	static public function branch_ofu($utheta)
+	{
+		if ( !is_numeric($utheta) ) {
+			return FALSE;
+		}
+
+		if ( ($utheta > -0.5) && ($utheta <= 0.5) ) {
+			$s = 0;
+		} else {
+			// s >= x
+			$s = (int) ceil( ($utheta - 0.5) );
 		}
 		return $s;
 	}
@@ -1328,4 +1280,34 @@ class Complex implements iComplex
 		return $r;
 	}
 
-}
+
+	/**
+	 * __toString()
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+	{
+		#$format='%13.5g';
+		$format='%.5g';
+		$str = sprintf($format, $this->Re()); 
+		if ( ($this->Re() >= 0) ) {
+			$str = ' ' . $str;
+		}
+		$format='%.5g';
+		if ( ($this->Im() > 0) ) {
+			$str .= ' + ' . sprintf($format, $this->Im()) . 'i'; 
+		} elseif ( ($this->Im() < 0) ) {
+			$str .= ' - ' . sprintf($format, abs($this->Im())) . 'i'; 
+		}
+		$str .= ' (';
+		if ( ($this->arg() >= 0) ) {
+			$str .= '+';
+		}
+		$str .= sprintf($format, rad2deg($this->arg()));
+		#$str .= 'º#' . $this->branch() . ')';
+		$str .= 'º' . (($this->branch() == 0)? '' 
+				: '#' . $this->branch()) . ')';
+		#return str_pad($str,26); 
+		return $str; 
+	}}
