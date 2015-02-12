@@ -53,6 +53,7 @@ interface iComplex
 	public function uminus_branch();
 	public function flat();
 
+	static public function set_format(callable $format = NULL);
 	public function __toString();
 
 	static public function c_add($a, $b, $s = NULL);

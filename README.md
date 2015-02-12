@@ -11,14 +11,14 @@ Release 0.1.1 (for PHP 5)
 
 ## Quick Start
 
-### include '*Complex.php*':
+#### include '*Complex.php*':
 
 ```php
 require_once '<path>/Complex.php';
 ```
 or use an autoloader.
 
-### set namespace use:
+#### set namespace use:
 
 ```php
 use enove\PHPComplex\Complex;
@@ -38,11 +38,6 @@ or:
 
 ```php
  $w = Complex::c_upolar(1, 1/6);
-```
-or, if you include `c_functions.php`:
-
-```php
- $w = c_polar(1, pi()/3);
 ```
 
 ### print a complex:

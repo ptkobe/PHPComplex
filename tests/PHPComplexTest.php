@@ -377,7 +377,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setExpectedException(
 			#'InvalidArgumentException', 'Right Message'
-			'InvalidArgumentException'
+			'DomainException'
 		);
 		$a = new Complex(0, 0);
 		$r = $a->log();
@@ -415,6 +415,13 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	{
 		$err = 1e-12;
 		
+		$a = new Complex(1e-324, 0, 2);
+
+		$z = new Complex(3, 0);
+		$r = $a->pow($z);
+		$t = new Complex(0, 0, 0);
+		$this->assertEquals($t, $r);
+
 		$a = new Complex(0, 0, 2);
 
 		$z = new Complex(0, 0);
@@ -438,7 +445,8 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 		$z = new Complex(0, .2);
 		$r = $a->pow($z);
 		$t = new Complex(0.063834651394626, 0.021287936620404, 0);
-		$this->assertTrue(Complex::is_equal($t,$r,1e-5,TRUE), '');
+		#$t = Complex::c_upolar(0.067290704887285, 0.051229999872678,0);
+		$this->assertTrue(Complex::is_equal($t, $r,$err,TRUE), '');
 
 		$z = new Complex(.5, 0);
 		$r = $a->pow($z);

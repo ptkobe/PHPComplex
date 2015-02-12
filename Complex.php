@@ -43,6 +43,12 @@ class Complex implements iComplex
 	 */
 	protected $theta;
 
+	/**
+	 * Complex string output format function. 
+	 * Takes the object as argument. Defaults to $this->toString().
+	 */
+	static protected $format_call = NULL;
+
 
 	/**
 	 * Complex construct.
@@ -53,7 +59,7 @@ class Complex implements iComplex
 	 * @param bool  (Optional) Mode (Coords/Polar).
 	 * 
 	 * @return object Complex
-	 * @throws 
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct($x = NULL, $y = NULL, $s = NULL, $mode = NULL)
 	{
@@ -97,6 +103,7 @@ class Complex implements iComplex
 	 * @param float (Optional) Imaginary part. Default: 0.
 	 * @param int   (Optional) Branch. Default: 0.
 	 * @return object Complex
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_coords($x = NULL, $y = NULL, $s = NULL)
 	{
@@ -111,6 +118,7 @@ class Complex implements iComplex
 	 * @param float (Optional) Angle. Default: 0.
 	 * @param bool  (Optional) unitary flag. Default: FALSE.
 	 * @return object Complex
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_polar($r = NULL, $theta = NULL, $umode = NULL)
 	{
@@ -124,6 +132,7 @@ class Complex implements iComplex
 	 * @param float (Optional) Radius. Default: 0.
 	 * @param float (Optional) Angle as unitary. Default: 0.
 	 * @return object Complex
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_upolar($r = NULL, $utheta = NULL)
 	{
@@ -136,6 +145,7 @@ class Complex implements iComplex
 	 * @param array An array( Re, Im [, branch] )
 	 * @param int   (Optional) Branch.
 	 * @return object Complex.
+	 * @throws \InvalidArgumentException
 	 */
 	static public function atoc($a, $s = NULL) {
 		if ( isset($a[2]) && is_null($s) ) {
@@ -153,6 +163,7 @@ class Complex implements iComplex
 	 * @param float (Optional) Imaginary part.
 	 * @param int   (Optional) Branch.
 	 * @return object Complex.
+	 * @throws \InvalidArgumentException
 	 */
 	public function set_coords($x = NULL, $y = NULL, $s = NULL)
 	{
@@ -192,6 +203,7 @@ class Complex implements iComplex
 	 * @param float (Optional) Angle.
 	 * @param bool  (Optional) unitary flag. Default: FALSE.
 	 * @return object Complex A
+	 * @throws \InvalidArgumentException
 	 */
 	public function set_polar($r = NULL, $theta = NULL, $umode = NULL)
 	{
@@ -205,8 +217,8 @@ class Complex implements iComplex
 			}
 			$this->set_abs($r);
 		}
-		if ( !is_null($theta) || !is_finite($theta) ) {
-			if ( !is_numeric($theta) ) {
+		if ( !is_null($theta) ) {
+			if ( !is_numeric($theta) || !is_finite($theta) ) {
 				throw new \InvalidArgumentException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'invalid argument')
 				);
@@ -268,14 +280,14 @@ class Complex implements iComplex
 	{
 		$c = $this->conj($s);
 		if ( ($this->mode() === self::COORDS) ) {
-			if ( ($this->Re() == 0) && ($this->Im() == 0) ) {
+			$r2 = $this->abs2();
+			if ( !is_finite(1/$r2) ) {
 				return 1/0;
 			}
-			$r2 = $this->abs2();
 			$c->set_Re($c->Re()/$r2);
 			$c->set_Im($c->Im()/$r2);
 		} elseif  ( ($this->mode() === self::POLAR) ) {
-			if ( ($this->abs() == 0) ) {
+			if ( !is_finite(1/$this->abs()) ) {
 				return 1/0;
 			}
 			$c->set_abs(1/$this->abs()); 
@@ -392,6 +404,7 @@ class Complex implements iComplex
 	 * 
 	 * @param int (Optional) Branch s for the result.
 	 * @return object Complex log(A).
+	 * @throws \DomainException Logarithm of zero.
 	 */
 	public function log($s = NULL)
 	{
@@ -411,11 +424,17 @@ class Complex implements iComplex
 				$s
 			);
 		} catch (\Exception $e) {
-			$c = new static(
-				log($this->abs()), 
-				$this->theta(),
-				$s
-			);
+			try {
+				$c = new static(
+					log($this->abs()), 
+					$this->theta(),
+					$s
+				);
+			} catch (\Exception $e) {
+				throw new \DomainException(
+					dgettext(PHPCOMPLEX_DOMAIN, 'logarithm of zero')
+				);
+			}
 		}
 		return $c;
 	}
@@ -442,6 +461,7 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A+B.
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_add($a, $b, $s = NULL)
 	{
@@ -475,6 +495,7 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A-B.
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_sub($a, $b, $s = NULL)
 	{
@@ -508,6 +529,7 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A*B.
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_mult($a, $b, $s = NULL)
 	{
@@ -552,6 +574,8 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int (Optional) Branch for the result.
 	 * @return object Complex A/B.
+	 * @throws \InvalidArgumentException
+	 * @throws \DomainException Divide by zero.
 	 */
 	static public function c_div($a, $b, $s = NULL)
 	{
@@ -570,7 +594,7 @@ class Complex implements iComplex
 		if ( ($a->mode() === self::COORDS) 
 				&& ($a->mode() === self::POLAR) ) {
 			if ( ($b->abs() == 0) ) {
-				throw new \InvalidArgumentException(
+				throw new \DomainException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
 				);
 				#return 1/0;
@@ -608,6 +632,7 @@ class Complex implements iComplex
 	 * @param object Complex A.
 	 * @param object Complex z.
 	 * @return object Complex A ** z.
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_pow($a, $z)
 	{
@@ -627,8 +652,14 @@ class Complex implements iComplex
 			// 0 ** z = 0
 			return new static(0, 0, 0);
 		}
-		
-		return $z->mult($a->log())->exp();
+		try {
+			$c = $a->log();
+		} catch (\Exception $e) {
+			// 0 ** z = 0
+			return new static(0, 0, 0);
+		}
+
+		return $z->mult($c)->exp();
 	}
 
 	/**
@@ -639,6 +670,7 @@ class Complex implements iComplex
 	 * @param int    (Optional) Branch for the result.
 	 *     If branch is null, return array( 0 => c_pow(A,z) ).
 	 * @return array Array of solutions of A ** z.
+	 * @throws \InvalidArgumentException
 	 */
 	static public function c_apow($w, $z, $s = NULL)
 	{
@@ -675,6 +707,12 @@ class Complex implements iComplex
 			// 0 ** z = 0
 			$av[] = new static(0, 0, 0);
 			return $av;
+		}
+		try {
+			$c = $a->log();
+		} catch (\Exception $e) {
+			// 0 ** z = 0
+			return new static(0, 0, 0);
 		}
 		
 		if ( is_null($s) ) {
@@ -744,6 +782,7 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex this+B.
+	 * @throws \InvalidArgumentException
 	 */
 	public function add($b, $s = NULL)
 	{
@@ -756,6 +795,7 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int (Optional) Branch for the result.
 	 * @return object Complex this-B.
+	 * @throws \InvalidArgumentException
 	 */
 	public function sub($b, $s = NULL)
 	{
@@ -768,6 +808,7 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int   (Optional) Branch for the result.
 	 * @return object Complex this*B.
+	 * @throws \InvalidArgumentException
 	 */
 	public function mult($b, $s = NULL)
 	{
@@ -780,6 +821,8 @@ class Complex implements iComplex
 	 * @param object Complex B.
 	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex this/B.
+	 * @throws \InvalidArgumentException
+	 * @throws \DomainException Divide by zero.
 	 */
 	public function div($b, $s = NULL)
 	{
@@ -791,6 +834,7 @@ class Complex implements iComplex
 	 * 
 	 * @param object Complex z.
 	 * @return object Complex A**z.
+	 * @throws \InvalidArgumentException
 	 */
 	public function pow($z)
 	{
@@ -804,6 +848,7 @@ class Complex implements iComplex
 	 * @param int    (Optional) Branch for the result.
 	 *     If s is null, return array( 0 => w->pow(z) ).
 	 * @return array Array of solutions of this**z.
+	 * @throws \InvalidArgumentException
 	 */
 	public function apow($z, $s = NULL)
 	{
@@ -891,11 +936,6 @@ class Complex implements iComplex
 				$cos = 0;
 			}
 			$x = $this->abs()*$cos;
-			#if ( is_nan($x) ) {
-			#	if ( ($cos == 0) ) {
-			#		$x = 0;
-			#	}
-			#}
 		} else {
 			return NULL;
 		}
@@ -906,11 +946,11 @@ class Complex implements iComplex
 	 * Set Re().
 	 *
 	 * @param float Real part.
-	 * @return void
+	 * @return void or FALSE on invalid argument
 	 */
 	public function set_Re($x)
 	{
-		if ( !is_numeric($x) ) {
+		if ( !is_numeric($x) || !is_finite($x) ) {
 			return FALSE;
 		}
 
@@ -940,11 +980,6 @@ class Complex implements iComplex
 				$sin = 0;
 			}
 			$y = $this->abs()*$sin;
-			#if ( is_nan($y) ) {
-			#	if ( ($sin == 0) ) {
-			#		$y = 0;
-			#	}
-			#}
 		} else {
 			return NULL;
 		}
@@ -955,11 +990,11 @@ class Complex implements iComplex
 	 * Set Im().
 	 *
 	 * @param float Imaginary part.
-	 * @return void
+	 * @return void or FALSE on invalid argument
 	 */
 	public function set_Im($x)
 	{
-		if ( !is_numeric($x) ) {
+		if ( !is_numeric($x) || !is_finite($x) ) {
 			return FALSE;
 		}
 
@@ -1026,11 +1061,11 @@ class Complex implements iComplex
 	 * Set Absolute/Radius.
 	 * 
 	 * @param float New |A|.
-	 * @return void
+	 * @return void or FALSE on invalid argument
 	 */
 	public function set_abs($x)
 	{
-		if ( !is_numeric($x) ) {
+		if ( !is_numeric($x) || !is_finite($x) ) {
 			return FALSE;
 		}
 		
@@ -1058,7 +1093,7 @@ class Complex implements iComplex
 		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$arg = 2*pi()*$this->uarg();
 		} else {
-			return FALSE;
+			return NULL;
 		}
 		return $arg;
 	}
@@ -1083,7 +1118,7 @@ class Complex implements iComplex
 				);
 			}
 		} else {
-			return FALSE;
+			return NULL;
 		}
 		return $uarg;
 	}
@@ -1115,7 +1150,7 @@ class Complex implements iComplex
 			}
 			$utheta = $this->theta;
 		} else {
-			return FALSE;
+			return NULL;
 		}
 		return $utheta;
 	}
@@ -1124,7 +1159,7 @@ class Complex implements iComplex
 	 * Set Angle.
 	 *
 	 * @param float New Angle.
-	 * @return void
+	 * @return void or FALSE on invalid argument
 	 */
 	public function set_theta($theta)
 	{
@@ -1134,11 +1169,11 @@ class Complex implements iComplex
 	 * Set Angle from unitary angle.
 	 *
 	 * @param float Unitary Angle.
-	 * @return void
+	 * @return void or FALSE on invalid argument
 	 */
 	public function set_utheta($utheta)
 	{
-		if ( !is_numeric($utheta) ) {
+		if ( !is_numeric($utheta) || !is_finite($utheta) ) {
 			return FALSE;
 		}
 		if ( ($this->mode() === self::COORDS) ) {
@@ -1172,7 +1207,7 @@ class Complex implements iComplex
 	 * Set "branch".
 	 *
 	 * @param int New branch.
-	 * @return void
+	 * @return void or FALSE on invalid argument
 	 */
 	public function set_branch($s)
 	{
@@ -1221,14 +1256,14 @@ class Complex implements iComplex
 	 */
 	static public function branch_ofu($utheta)
 	{
-		if ( !is_numeric($utheta) ) {
+		if ( !is_numeric($utheta) || !is_finite($utheta) ) {
 			return FALSE;
 		}
 
 		if ( ($utheta > -0.5) && ($utheta <= 0.5) ) {
 			$s = 0;
 		} else {
-			// s >= x
+			// int s >= x
 			$s = (int) ceil( ($utheta - 0.5) );
 		}
 		return $s;
@@ -1270,16 +1305,30 @@ class Complex implements iComplex
 	static public function is_equal($a, $b, $err = NULL, $strict = NULL)
 	{
 		if ( is_null($err) ) {
-			$err = 1e-12;
+			$r = ( $a->Re() == $b->Re() ) 
+					&& ( $a->Im() == $b->Im() );
+		}else {
+			$r = ( abs($a->Re() - $b->Re()) <= $err ) 
+					&& ( abs($a->Im() - $b->Im()) <= $err );
 		}
-		$r = ( abs($a->Re() - $b->Re()) <= $err ) 
-				&& ( abs($a->Im() - $b->Im()) <= $err );
 		if ( $r && !empty($strict) ) {
 			$r = $r && ($a->branch() == $b->branch());
 		}
 		return $r;
 	}
 
+	/**
+	 * Sets the format call for complex string output.
+	 * 
+	 * @param callable (Optional) A callable 
+	 * @return callable The previous function.
+	 */
+	public static function set_format(callable $format = NULL)
+	{
+		$old_fmt = self::$format_call;
+		self::$format_call = $format;
+		return $old_fmt;
+	}
 
 	/**
 	 * __toString()
@@ -1288,7 +1337,25 @@ class Complex implements iComplex
 	 */
 	public function __toString()
 	{
-		#$format='%13.5g';
+		#return f($this);
+		
+		if ( is_null(self::$format_call) ) {
+			$f = function() { return $this->toString(); };
+		} else {
+			$f = self::$format_call;
+		}
+		return $f($this);
+		
+	}
+	
+	/**
+	 * This is the default function called by __toString() if not
+	 * otherwise set by format(). 
+	 * 
+	 * @return string
+	 */
+	public function toString()
+	{
 		$format='%.5g';
 		$str = sprintf($format, $this->Re()); 
 		if ( ($this->Re() >= 0) ) {
@@ -1300,14 +1367,9 @@ class Complex implements iComplex
 		} elseif ( ($this->Im() < 0) ) {
 			$str .= ' - ' . sprintf($format, abs($this->Im())) . 'i'; 
 		}
-		$str .= ' (';
-		if ( ($this->arg() >= 0) ) {
-			$str .= '+';
-		}
-		$str .= sprintf($format, rad2deg($this->arg()));
-		#$str .= 'º#' . $this->branch() . ')';
-		$str .= 'º' . (($this->branch() == 0)? '' 
-				: '#' . $this->branch()) . ')';
-		#return str_pad($str,26); 
+		$str .= ($this->branch() == 0)? '' 
+				: '(' . $this->branch() . ')';
 		return $str; 
-	}}
+	}
+
+}
