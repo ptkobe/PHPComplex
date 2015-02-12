@@ -55,18 +55,18 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="phpcomplex" class="section level1">
 <h1>PHPComplex</h1>
 <p>Complex vector and polar definitions with “branches”.</p>
-<p>Elementary complex numbers operations (add, sub, mult, div), and: <code>$a-&gt;Re()</code>, <code>$a-&gt;Im()</code>, <code>$a-&gt;arg()</code>, <code>$a-&gt;theta()</code>, <code>$a-&gt;abs()</code>, <code>$a-&gt;conj()</code>, <code>$a-&gt;inv()</code>, <code>$a-&gt;log()</code>, <code>$a-&gt;exp()</code>, <code>$a-&gt;pow($z)</code>, <code>$a-&gt;sqrt()</code>.</p>
+<p>Elementary complex numbers operations (add, sub, mult, div), and: <code>$a-&gt;Re()</code>, <code>$a-&gt;Im()</code>, <code>$a-&gt;arg()</code>, <code>$a-&gt;theta()</code>, <code>$a-&gt;abs()</code>, <code>$a-&gt;conj()</code>, <code>$a-&gt;inv()</code>, <code>$a-&gt;uminus()</code>, <code>$a-&gt;sqrt()</code>, <code>$a-&gt;log()</code>, <code>$a-&gt;exp()</code>, <code>$a-&gt;pow($z)</code>.</p>
 <p>Namespace: <code>enove\PHPComplex</code>.</p>
-<p>Release 0.1-dev (for PHP 5)</p>
+<p>Release 0.1.1 (for PHP 5)</p>
 <div id="quick-start" class="section level2">
 <h2>Quick Start</h2>
-<div id="include-complex.php" class="section level3">
-<h3>include ‘<em>Complex.php</em>’:</h3>
+<div id="include-complex.php" class="section level4">
+<h4>include ‘<em>Complex.php</em>’:</h4>
 <pre class="php"><code>require_once '&lt;path&gt;/Complex.php';</code></pre>
 <p>or use an autoloader.</p>
 </div>
-<div id="set-namespace-use" class="section level3">
-<h3>set namespace use:</h3>
+<div id="set-namespace-use" class="section level4">
+<h4>set namespace use:</h4>
 <pre class="php"><code>use enove\PHPComplex\Complex;</code></pre>
 </div>
 <div id="create-a-complex" class="section level3">
@@ -76,8 +76,6 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <pre class="php"><code> $w = Complex::c_polar(1, pi()/3);</code></pre>
 <p>or:</p>
 <pre class="php"><code> $w = Complex::c_upolar(1, 1/6);</code></pre>
-<p>or, if you include <code>c_functions.php</code>:</p>
-<pre class="php"><code> $w = c_polar(1, pi()/3);</code></pre>
 </div>
 <div id="print-a-complex" class="section level3">
 <h3>print a complex:</h3>
