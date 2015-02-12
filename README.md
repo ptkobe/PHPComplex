@@ -7,7 +7,7 @@ Elementary complex numbers operations (add, sub, mult, div), and:
 
 Namespace: `enove\PHPComplex`.
 
-Release 0.1.1 (for PHP 5)
+Release 0.2-dev (for PHP 5)
 
 ## Quick Start
 
