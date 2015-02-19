@@ -314,7 +314,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setExpectedException(
 			#'InvalidArgumentException', 'Right Message'
-			'InvalidArgumentException'
+			'DomainException'
 		);
 		$a = new Complex(2, 0, 2);
 		$b = new Complex(0, 0, 2);
@@ -326,7 +326,7 @@ class PHPComplexTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setExpectedException(
 			#'InvalidArgumentException', 'Right Message'
-			'InvalidArgumentException'
+			'DomainException'
 		);
 		$a = Complex::c_polar(2, 0, 2);
 		$b = Complex::c_polar(0, 0, 2);

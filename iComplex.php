@@ -19,16 +19,16 @@ interface iComplex
 	static public function c_polar($r = NULL, $theta = NULL, $umode = NULL);
 	static public function c_upolar($r = NULL, $utheta = NULL);
 
-	public function conj($s = NULL);
-	public function inv($s = NULL);
-	public function uminus($s = NULL);
-	public function sqrt($s = NULL);
-	public function log($s = NULL);
+	public function conj();
+	public function inv();
+	public function uminus();
+	public function sqrt();
+	public function log();
 	public function exp();
-	public function add($b, $s = NULL);
-	public function sub($b, $s = NULL);
-	public function mult($b, $s = NULL);
-	public function div($b, $s = NULL);
+	public function add($b);
+	public function sub($b);
+	public function mult($b);
+	public function div($b);
 	public function pow($z);
 	public function asqrt($s = NULL);
 	public function apow($z, $s = NULL);
@@ -56,10 +56,10 @@ interface iComplex
 	static public function set_format(callable $format = NULL);
 	public function __toString();
 
-	static public function c_add($a, $b, $s = NULL);
-	static public function c_sub($a, $b, $s = NULL);
-	static public function c_mult($a, $b, $s = NULL);
-	static public function c_div($a, $b, $s = NULL);
+	static public function c_add($a, $b);
+	static public function c_sub($a, $b);
+	static public function c_mult($a, $b);
+	static public function c_div($a, $b);
 	static public function c_pow($a, $z);
 	static public function c_apow($a, $z, $s = NULL);
 

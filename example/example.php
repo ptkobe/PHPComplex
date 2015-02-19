@@ -8,7 +8,8 @@ $w = new Complex(0, 4, 3);
 	#$w = Complex::c_coords(0, 4, 3);
 	#$w = Complex::c_polar(4, 3*2*pi()+1/2*pi());
 	#$w = Complex::c_upolar(4, 3.25);
-$z = new Complex(-1/3, 0.1);
+#$z = new Complex(-1/3, 0.1);
+$z = new Complex(1/3*1e-120, 0);
 
 echo 'Complex exponents with complex bases example: v = w ** z',"\n";
 echo 'w = ',$w,"\n";
@@ -33,8 +34,9 @@ echo 'Now, for all the results av = { v = w ** z } on default branch '.$n.':',"\
 
 $av = $w->apow($z, $n);
 echo 'av = { ',"\n";
-foreach ($av as $va) {
-	echo '   ',$va,"\n";
+foreach ($av as $k=>$va) {
+	echo '   ',$k,': ',$va,"\n";
+	#echo '   ',$va,"\n";
 }
 echo '}',"\n";
 

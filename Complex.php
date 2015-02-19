@@ -239,31 +239,19 @@ class Complex implements iComplex
 	 * @param int (Optional) Branch for the result.
 	 * @return object Complex Re(A)-Im(A)i
 	 */
-	public function conj($s = NULL)
+	public function conj()
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
-		
 		if ( ($this->mode() === self::COORDS) ) {
 			$c = new static(
 				$this->Re(),
-				-$this->Im()
+				-$this->Im(),
+				$this->uminus_branch()
 			);
-			if ( is_null($s) ) {
-				$s = $this->uminus_branch();
-			}
-			$c->set_branch($s);
 		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				$this->abs(), 
 				-$this->utheta()
 			);
-			if ( !is_null($s) ) {
-				$c->set_branch($s);
-			}
 		} else {
 			return NULL;
 		}
@@ -275,22 +263,28 @@ class Complex implements iComplex
 	 * 
 	 * @param int (Optional) Branch for the result.
 	 * @return object Complex 1/A.
+	 * @throws \DomainException Divide by zero.
 	 */
-	public function inv($s = NULL)
+	public function inv()
 	{
-		$c = $this->conj($s);
+		$c = $this->conj();
 		if ( ($this->mode() === self::COORDS) ) {
-			$r2 = $this->abs2();
-			if ( !is_finite(1/$r2) ) {
-				return 1/0;
+			@$q = 1/$this->abs2();
+			if ( !is_numeric($q) || !is_finite($q) ) {
+				throw new \DomainException(
+					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
+				);
 			}
-			$c->set_Re($c->Re()/$r2);
-			$c->set_Im($c->Im()/$r2);
+			$c->set_Re($c->Re()*$q);
+			$c->set_Im($c->Im()*$q);
 		} elseif  ( ($this->mode() === self::POLAR) ) {
-			if ( !is_finite(1/$this->abs()) ) {
-				return 1/0;
+			@$q = 1/$this->abs();
+			if ( !is_numeric($q) || !is_finite($q) ) {
+				throw new \DomainException(
+					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
+				);
 			}
-			$c->set_abs(1/$this->abs()); 
+			$c->set_abs($q); 
 		} else {
 			return NULL;
 		}
@@ -303,29 +297,20 @@ class Complex implements iComplex
 	 * @param int (Optional) Branch for the result.
 	 * @return object Complex -A.
 	 */
-	public function uminus($s = NULL)
+	public function uminus()
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
-
-		if ( is_null($s) ) {
-			$s = $this->branch();
-		}
 		if ( ($this->mode() === self::COORDS) ) {
 			$c = new static(
 				-$this->Re(),
 				-$this->Im(),
-				$s
+				$this->branch()
 			);
 		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				$this->abs(), 
 				$this->utheta()+0.5
 			);
-			$c->set_branch($s);
+			$c->set_branch($this->branch());
 		} else {
 			return NULL;
 		}
@@ -338,14 +323,8 @@ class Complex implements iComplex
 	 * @param int (Optional) Branch for the result.
 	 * @return object Complex square root of A.
 	 */
-	public function sqrt($s = NULL)
+	public function sqrt()
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
-		
 		if ( ($this->mode() === self::COORDS) ) {
 			$r = $this->abs();
 			$rc = sqrt( ($r + $this->Re())/2 );
@@ -359,19 +338,13 @@ class Complex implements iComplex
 				$ic = -$ic;
 			}
 			
-			if ( is_null($s) ) {
-				$s = static::branch_of($theta);
-			}
-			$c = new static($rc, $ic, $s);
+			$c = new static($rc, $ic, static::branch_of($theta));
 
 		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				sqrt($this->abs()), 
 				$this->utheta()/2
 			);
-			if ( !is_null($s) ) {
-				$c->set_branch($s);
-			}
 		} else {
 			return NULL;
 		}
@@ -392,7 +365,10 @@ class Complex implements iComplex
 			);
 		}
 
-		$c = $this->sqrt($s);
+		$c = $this->sqrt();
+		if ( !is_null($s) ) {
+			$c->set_branch($s);
+		}
 		return array(
 			$c,
 			$c->uminus(),
@@ -406,29 +382,20 @@ class Complex implements iComplex
 	 * @return object Complex log(A).
 	 * @throws \DomainException Logarithm of zero.
 	 */
-	public function log($s = NULL)
+	public function log()
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
-
-		if ( is_null($s) ) {
-			$s = 0;
-		}
 		try {
 			$c = new static(
 				0.5*log($this->abs2()), 
 				$this->theta(),
-				$s
+				0
 			);
 		} catch (\Exception $e) {
 			try {
 				$c = new static(
 					log($this->abs()), 
 					$this->theta(),
-					$s
+					0
 				);
 			} catch (\Exception $e) {
 				throw new \DomainException(
@@ -446,10 +413,21 @@ class Complex implements iComplex
 	 */
 	public function exp()
 	{
+		if ( !is_finite(exp($this->Re())) ) {
+			throw new \DomainException(
+				dgettext(PHPCOMPLEX_DOMAIN, 'infinite exponential')
+			);
+		}
 		$c = static::c_polar(
 			exp($this->Re()), 
 			$this->Im()
 		);
+		/*
+		$c = static::c_polar(
+			expm1($this->Re()) + 1, 
+			$this->Im()
+		);
+		*/
 		return $c;
 	}
 	
@@ -459,31 +437,22 @@ class Complex implements iComplex
 	 *
 	 * @param object Complex A.
 	 * @param object Complex B.
-	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A+B.
 	 * @throws \InvalidArgumentException
 	 */
-	static public function c_add($a, $b, $s = NULL)
+	static public function c_add($a, $b)
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, NULL, $s);
+			$a = new static($a);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, NULL, $s);
+			$b = new static($b);
 		}
 
-		if ( is_null($s) ) {
-			$s = $a->branch();
-		}
 		$c = new static(
 			$a->Re()+$b->Re(),
 			$a->Im()+$b->Im(),
-			$s
+			$a->branch()
 		);
 		return $c;
 	}
@@ -493,31 +462,22 @@ class Complex implements iComplex
 	 *
 	 * @param object Complex A.
 	 * @param object Complex B.
-	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A-B.
 	 * @throws \InvalidArgumentException
 	 */
-	static public function c_sub($a, $b, $s = NULL)
+	static public function c_sub($a, $b)
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, NULL, $s);
+			$a = new static($a);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, NULL, $s);
+			$b = new static($b);
 		}
 
-		if ( is_null($s) ) {
-			$s = $a->branch();
-		}
 		$c = new static(
 			$a->Re()-$b->Re(),
 			$a->Im()-$b->Im(),
-			$s
+			$a->branch()
 		);
 		return $c;
 	}
@@ -527,37 +487,26 @@ class Complex implements iComplex
 	 *
 	 * @param object Complex A.
 	 * @param object Complex B.
-	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex A*B.
 	 * @throws \InvalidArgumentException
 	 */
-	static public function c_mult($a, $b, $s = NULL)
+	static public function c_mult($a, $b)
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, NULL, $s);
+			$a = new static($a);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, NULL, $s);
+			$b = new static($b);
 		}
 
-		if ( ($a->mode() === self::COORDS) 
-				&& ($a->mode() === self::POLAR) ) {
+		if ( ($a->mode() === self::POLAR) 
+				&& ($b->mode() === self::POLAR) ) {
 			$c = static::c_upolar(
 				$a->abs()*$b->abs(),
 				$a->utheta() + $b->utheta()
 			);
-			if ( !is_null($s) ) {
-				$c->set_branch($s);
-			}
 		} else {
-			if ( is_null($s) ) {
-				$s = static::branch_ofu( $a->utheta() + $b->utheta() );
-			}
+			$s = static::branch_ofu( $a->utheta() + $b->utheta() );
 			$c = new static(
 				$a->Re()*$b->Re()-$a->Im()*$b->Im(),
 				$a->Im()*$b->Re()+$a->Re()*$b->Im(),
@@ -572,51 +521,38 @@ class Complex implements iComplex
 	 *
 	 * @param object Complex A.
 	 * @param object Complex B.
-	 * @param int (Optional) Branch for the result.
 	 * @return object Complex A/B.
 	 * @throws \InvalidArgumentException
 	 * @throws \DomainException Divide by zero.
 	 */
-	static public function c_div($a, $b, $s = NULL)
+	static public function c_div($a, $b)
 	{
-		if ( !is_null($s) && !is_int($s) ) {
-			throw new \InvalidArgumentException(
-				dgettext(PHPCOMPLEX_DOMAIN, 'invalid branch')
-			);
-		}
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, NULL, $s);
+			$a = new static($a);
 		}
 		if ( !static::is_complex($b) ) {
-			$b = new static($b, NULL, $s);
+			$b = new static($b);
 		}
 
-		if ( ($a->mode() === self::COORDS) 
-				&& ($a->mode() === self::POLAR) ) {
+		if ( ($a->mode() === self::POLAR) 
+				&& ($b->mode() === self::POLAR) ) {
 			if ( ($b->abs() == 0) ) {
 				throw new \DomainException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
 				);
-				#return 1/0;
 			}
 			$c = static::c_upolar(
 				$a->abs()/$b->abs(),
 				$a->utheta() - $b->utheta()
 			);
-			if ( !is_null($s) ) {
-				$c->set_branch($s);
-			}
 		} else {
 			$r2b = $b->abs2();
 			if ( ($r2b == 0) ) {
-				throw new \InvalidArgumentException(
+				throw new \DomainException(
 					dgettext(PHPCOMPLEX_DOMAIN, 'divide by zero')
 				);
-				#return 1/0;
 			}
-			if ( is_null($s) ) {
-				$s = static::branch_ofu( $a->utheta() - $b->utheta() );
-			}
+			$s = static::branch_ofu( $a->utheta() - $b->utheta() );
 			$c = new static(
 				($a->Re()*$b->Re()+$a->Im()*$b->Im())/$r2b,
 				($a->Im()*$b->Re()-$a->Re()*$b->Im())/$r2b,
@@ -638,10 +574,10 @@ class Complex implements iComplex
 	{
 		
 		if ( !static::is_complex($a) ) {
-			$a = new static($a, NULL, 0);
+			$a = new static($a);
 		}
 		if ( !static::is_complex($z) ) {
-			$z = new static($z, NULL, 0);
+			$z = new static($z);
 		}
 		
 		if ( ($z->Re() == 0) && ($z->Im() == 0) ) {
@@ -688,10 +624,10 @@ class Complex implements iComplex
 			);
 		}
 		if ( !static::is_complex($w) ) {
-			$w = new static($w, NULL, 0);
+			$w = new static($w);
 		}
 		if ( !static::is_complex($z) ) {
-			$z = new static($z, NULL, 0);
+			$z = new static($z);
 		}
 		
 		$a = clone($w);
@@ -712,7 +648,8 @@ class Complex implements iComplex
 			$c = $a->log();
 		} catch (\Exception $e) {
 			// 0 ** z = 0
-			return new static(0, 0, 0);
+			$av[] = new static(0, 0, 0);
+			return $av;
 		}
 		
 		if ( is_null($s) ) {
@@ -722,14 +659,6 @@ class Complex implements iComplex
 		}
 		
 		if ( ( $z->Re() == 0 ) ) {
-			#if ( ( $z->Im() == 0 ) ) {
-			#	// w ** 0 = 1
-			#	$av = array( 
-			#		0 => new static(1, 0, $s)
-			#	);
-			#	return $av;
-			#}
-			
 			// Only one result
 			$r_v = exp(-$z->Im() * $a->theta());
 			$theta_v = $z->Im() * log($a->abs());
@@ -747,15 +676,16 @@ class Complex implements iComplex
 			$k = (int) floor( $ks - 0.5/$z->Re() ) + 1;
 			// f <= x
 			$f = (int) floor( $ks + 0.5/$z->Re() );
+			echo '$f = ',$f, "\n";
 			if ( ($f-$k > $max_roots) ) {
 				trigger_error('too many roots... retriving first ' . $max_roots . '.', E_USER_WARNING);
-				$f = $k+$max_roots;
+				$f = $k+$max_roots-1;
 			}
-			do {
+			while ( ($k <= $f) ) {
 				$a->set_branch($sa+$k);
 				$av[$k] = $z->mult($a->log())->exp();
 				$k++;
-			} while ( ($k <= $f) );
+			}
 		} else {
 			// k < x
 			$k = (int) ceil( $ks - 0.5/$z->Re() ) - 1;
@@ -765,11 +695,11 @@ class Complex implements iComplex
 				trigger_error('too many roots... retriving first ' . $max_roots . '.', E_USER_WARNING);
 				$f = $k-$max_roots;
 			}
-			do {
+			while ( ($k >= $f) ) {
 				$a->set_branch($sa+$k);
 				$av[$k] = $z->mult($a->log())->exp();
 				$k--;
-			} while ( ($k >= $f) );
+			}
 		}
 		
 		return $av;
@@ -780,53 +710,49 @@ class Complex implements iComplex
 	 * Addition.
 	 * 
 	 * @param object Complex B.
-	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex this+B.
 	 * @throws \InvalidArgumentException
 	 */
-	public function add($b, $s = NULL)
+	public function add($b)
 	{
-		return static::c_add($this, $b, $s);
+		return static::c_add($this, $b);
 	}
 
 	/**
 	 * Subtraction.
 	 *
 	 * @param object Complex B.
-	 * @param int (Optional) Branch for the result.
 	 * @return object Complex this-B.
 	 * @throws \InvalidArgumentException
 	 */
-	public function sub($b, $s = NULL)
+	public function sub($b)
 	{
-		return static::c_sub($this, $b, $s);
+		return static::c_sub($this, $b);
 	}
 
 	/**
 	 * Multiplication.
 	 *
 	 * @param object Complex B.
-	 * @param int   (Optional) Branch for the result.
 	 * @return object Complex this*B.
 	 * @throws \InvalidArgumentException
 	 */
-	public function mult($b, $s = NULL)
+	public function mult($b)
 	{
-		return static::c_mult($this, $b, $s);
+		return static::c_mult($this, $b);
 	}
 
 	/**
 	 * Division.
 	 *
 	 * @param object Complex B.
-	 * @param int    (Optional) Branch for the result.
 	 * @return object Complex this/B.
 	 * @throws \InvalidArgumentException
 	 * @throws \DomainException Divide by zero.
 	 */
-	public function div($b, $s = NULL)
+	public function div($b)
 	{
-		return static::c_div($this, $b, $s);
+		return static::c_div($this, $b);
 	}
 
 	/**
@@ -932,9 +858,14 @@ class Complex implements iComplex
 			$x = $this->re;
 		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$cos = cos($this->theta());
+			/*
+			$sin = sin($this->theta());
 			if ( (abs($cos) < $precision) ) {
 				$cos = 0;
+			} elseif ( (abs($sin) < $precision) ) {
+				$cos = 1;
 			}
+			*/
 			$x = $this->abs()*$cos;
 		} else {
 			return NULL;
@@ -976,9 +907,14 @@ class Complex implements iComplex
 			$y = $this->im;
 		} elseif  ( ($this->mode() === self::POLAR) ) {
 			$sin = sin($this->theta());
-			if ( (abs($sin) < $precision) ) {
+			/*
+			$cos = cos($this->theta());
+			if ( (abs($cos) < $precision) ) {
+				$sin = 1;
+			} elseif ( (abs($sin) < $precision) ) {
 				$sin = 0;
 			}
+			*/
 			$y = $this->abs()*$sin;
 		} else {
 			return NULL;
